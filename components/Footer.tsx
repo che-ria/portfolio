@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navItems } from "@/data/site";
+import { navItems } from "@/data/navigation";
 
 export function Footer() {
   const pathname = usePathname();

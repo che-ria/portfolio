@@ -11,7 +11,7 @@ export default function ContactPage() {
   return <main id="content" className="contact-page textured-section">
     <section className="contact-card" aria-label="Contact">
       <div className="contact-portrait">
-        <Image src={mediaUrl("/portfolio/profile/contact.jpg")} alt="Daryna Chernysheva" width={1320} height={1850} priority sizes="(max-width: 700px) 68vw, 330px" />
+        <Image src={mediaUrl("/portfolio/profile/contact.jpg")} alt="Daryna Chernysheva" width={1320} height={1850} preload sizes="(max-width: 700px) 68vw, 520px" />
       </div>
       <div className="contact-copy">
         <div className="contact-description">
