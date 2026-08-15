@@ -4,8 +4,23 @@
  * production domain) on every deployment, so previews still emit production
  * URLs rather than their own throwaway hostnames.
  */
-const configured = process.env.NEXT_PUBLIC_SITE_URL
-  ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined)
-  ?? "http://localhost:3000";
+function validHttpUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
 
-export const siteUrl = configured.replace(/\/$/, "");
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:"
+      ? url.href.replace(/\/$/, "")
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export const siteUrl = validHttpUrl(process.env.NEXT_PUBLIC_SITE_URL)
+  ?? validHttpUrl(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : undefined,
+  )
+  ?? "http://localhost:3000";

@@ -674,7 +674,7 @@ html, body, .projects-page, .project-page, .textured-section, .terms-main, .cont
 /* Project page title and navigation */
 html, body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero, .contact-page {
   background-color: #fbfbfa;
-  background-image: url("/textures/white-crumpled-paper.webp");
+  background-image: url("https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev/textures/white-crumpled-paper.webp");
   background-position: center;
   background-size: 1024px 1024px;
 }
@@ -707,7 +707,7 @@ html, body, .projects-page, .project-page, .textured-section, .terms-main, .cont
 /* One continuous paper surface across every page */
 html, body {
   background-color: #fbfbfa;
-  background-image: url("/textures/white-crumpled-paper.webp");
+  background-image: url("https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev/textures/white-crumpled-paper.webp");
   background-position: center top;
   background-size: 1024px 1024px;
   background-attachment: fixed;

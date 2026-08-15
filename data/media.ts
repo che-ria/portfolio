@@ -1,10 +1,6 @@
-const mediaBaseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL?.replace(/\/$/, "");
+export const mediaBaseUrl = "https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev";
 
-/**
- * Returns a media URL from object storage when configured, otherwise a local
- * public path. This keeps local development simple while production does not
- * need portfolio assets in the application repository.
- */
+/** Returns an absolute URL for an asset stored in the public Cloudflare R2 bucket. */
 export function mediaUrl(path: string): string {
-  return mediaBaseUrl ? `${mediaBaseUrl}${path}` : path;
+  return `${mediaBaseUrl}${path}`;
 }

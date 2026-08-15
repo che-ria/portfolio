@@ -31,7 +31,6 @@ reads/month, unlimited egress. The library fits with room to spare.
    R2's built-in `*.r2.dev` development URL is rate-limited and explicitly not
    meant for production traffic.
    [Public bucket guide](https://developers.cloudflare.com/r2/buckets/public-buckets/)
-4. Set `NEXT_PUBLIC_MEDIA_BASE_URL` (see below) locally and in Vercel.
 
 ### Directory layout
 
@@ -50,19 +49,12 @@ portfolio/
   cv.pdf
 ```
 
-### Environment variable
+### Connected bucket
 
-```dotenv
-NEXT_PUBLIC_MEDIA_BASE_URL=https://media.your-domain.com
-```
-
-Origin only: no trailing slash, no `/portfolio` suffix. With it set, every image
-and the CV link resolve to the CDN. Without it, the app falls back to matching
-files under `public/`, which is what makes local development work with a plain
-folder copy.
-
-`next.config.ts` derives `images.remotePatterns` from this variable and scopes it
-to `/portfolio/**`, so the image optimizer will only ever fetch from that prefix.
+The site uses `https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev` directly,
+configured in `data/media.ts`. Every portfolio image and the CV link resolve to
+this origin; the application has no local-media fallback. `next.config.ts`
+allows Next Image Optimization only for its `/portfolio/**` path.
 
 ## Caching
 

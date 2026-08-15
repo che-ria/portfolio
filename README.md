@@ -11,10 +11,9 @@ cp .env.example .env.local   # optional, see below
 npm run dev
 ```
 
-Without `.env.local` the site looks for images under `public/portfolio/`. Drop a
-copy of the media library there to work offline, or set
-`NEXT_PUBLIC_MEDIA_BASE_URL` to pull from the CDN instead. Media is never
-committed — see [ASSETS.md](ASSETS.md).
+All portfolio media is loaded from the public Cloudflare R2 bucket configured
+in `data/media.ts`; no portfolio assets need to be present in `public/`. Media
+is never committed — see [ASSETS.md](ASSETS.md).
 
 | Script | Purpose |
 | --- | --- |
@@ -29,11 +28,9 @@ committed — see [ASSETS.md](ASSETS.md).
 1. Push the repository to GitHub.
 2. In Vercel, **Add New → Project** and import it. The framework preset,
    build command and output directory are all detected automatically.
-3. Add the environment variables from `.env.example` under
-   **Settings → Environment Variables** (Production and Preview):
-   - `NEXT_PUBLIC_MEDIA_BASE_URL` — the R2 media origin
-   - `NEXT_PUBLIC_SITE_URL` — only needed once a custom domain is attached;
-     otherwise the production URL is detected automatically
+3. Optionally add `NEXT_PUBLIC_SITE_URL` under **Settings → Environment
+   Variables** once a custom domain is attached; otherwise the production URL
+   is detected automatically.
 4. Deploy.
 
 Do not add a `prebuild` step that deletes `.next/`. Vercel restores `.next/cache`
@@ -53,7 +50,7 @@ components/     ProjectGallery is the only stateful (client) component
 data/
   site.ts         the image catalogue — server-only, never bundled for browsers
   navigation.ts   nav links; kept separate because client components import it
-  media.ts        resolves a path to the CDN or to public/
+  media.ts        resolves a path to the Cloudflare R2 bucket
   site-url.ts     canonical origin for metadata
 ```
 
