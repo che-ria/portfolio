@@ -1,9 +1,28 @@
+# dependencies
 node_modules/
+
+# build output
 .next/
 out/
+*.tsbuildinfo
+
+# logs and local scratch
 *.log
+screenshots/
+/*-check.png
+
+# environment — .env.example is the only one that belongs in the repo
 .env*
 !.env.example
-screenshots/
+
+# hosting
+.vercel
+
+# portfolio media lives in object storage, never in Git (see ASSETS.md).
+# Keep a local copy in these folders for development; it stays untracked.
 public/art/
 public/portfolio/
+
+# OS cruft
+.DS_Store
+Thumbs.db
