@@ -1,5 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { navItems } from "@/data/site";
 
 export function Footer() {
-  return <footer className="site-footer"><p>© Daryna Chernysheva</p><nav aria-label="Footer"><Link href="/">Projects</Link><Link href="/illustrations">Illustrations</Link><Link href="/contact">Contact</Link></nav></footer>;
+  const pathname = usePathname();
+
+  return <footer className="site-footer">
+    <nav aria-label="Footer navigation">
+      {navItems.map((item) => <Link href={item.href} key={item.href} onClick={(event) => {
+        if (pathname === item.href) {
+          event.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }}>{item.label}</Link>)}
+    </nav>
+    <p>© Daryna Chernysheva</p>
+  </footer>;
 }

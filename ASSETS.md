@@ -1,54 +1,34 @@
-# Portfolio asset structure
+# Portfolio media
 
-All final portfolio media lives in `public/portfolio/`. Keep file and folder names lowercase, use hyphens instead of spaces, and avoid Cyrillic characters in paths.
+Portfolio images and the CV are not stored in Git. Store them in an object-storage bucket with CDN delivery. Cloudflare R2 is a good no-cost option for this portfolio: the current free tier includes 10 GB-month of Standard storage, 1 million writes, 10 million reads per month, and free egress. The current local media is about 644 MiB, so it fits comfortably if traffic stays within the request allowance. [R2 pricing](https://developers.cloudflare.com/r2/pricing/)
+
+Keep the same directory layout as the paths below, so existing portfolio metadata keeps working:
 
 ```text
-public/portfolio/
-├── projects/
-│   ├── cozy-tiny-home/
-│   │   ├── cover/
-│   │   │   └── cover.webp
-│   │   └── gallery/
-│   │       ├── 01-opening.webp
-│   │       ├── 02-process.webp
-│   │       └── 03-final.webp
-│   └── cottonville/
-│       ├── cover/
-│       ├── logo/
-│       │   └── logo.png
-│       └── gallery/
-├── illustrations/
-│   ├── illustration-name.webp
-│   └── another-work.webp
-└── profile/
-    └── portrait.webp
+portfolio/
+  projects/<project-slug>/{cover,logo,gallery}/...
+  illustrations/...
+  marketing-art/...
+  profile/icon.png
+  cv.pdf
+art/...
 ```
 
-## Project assets
+Set this variable in `.env.local` for development and in the hosting provider's production environment:
 
-- Give every project a unique slug such as `character-design`, `short-comic`, or `game-concept`.
-- Put one landscape cover in `cover/`. A 16:9 image around 1600×900 px is ideal.
-- Put the transparent project logo in `logo/logo.png` when a card should use artwork instead of a text title.
-- Put all project images in `gallery/` in their intended reading order.
-- Prefix gallery filenames with `01-`, `02-`, `03-`, and so on.
-- Use `.webp` or `.avif` for finished web assets. `.png` is useful when transparency is required.
-- Do not place source `.psd`, `.clip`, `.ai`, or very large print files in `public/`.
-
-Public paths begin after the `public` directory. For example:
-
-```ts
-cover: "/portfolio/projects/character-design/cover/cover.webp"
-logo: "/portfolio/projects/character-design/logo/logo.png"
-
-{ src: "/portfolio/projects/character-design/gallery/01-sketches.webp", ... }
+```dotenv
+NEXT_PUBLIC_MEDIA_BASE_URL=https://media.example.com
 ```
 
-Project names, covers, descriptions, and gallery order are registered in `data/site.ts`.
+The value is the origin only: no trailing slash and no `/portfolio` suffix. With it set, every image and CV link is served from the CDN. Without it, the app uses matching files in `public/`, which is convenient for a local temporary copy.
 
-## Personal illustrations
+`public/portfolio/` and `public/art/` are ignored by Git. After the files have been uploaded and the deployment environment variable is set, remove already tracked assets from Git while retaining local copies:
 
-Put standalone personal pieces in `public/portfolio/illustrations/`. Their titles, alt text, and orientation are registered in the `artworks` array in `data/site.ts`.
+```powershell
+git rm -r --cached public/portfolio public/art
+git commit -m "Move portfolio media to object storage"
+```
 
-## Profile image
+Use immutable names for new uploads (for example, `cover.3f14c2.webp`) or enable versioned object URLs. The CDN can then cache media for a year safely; updating an image means changing the filename/reference instead of fighting browser or CDN caches.
 
-Put the final portrait or self-portrait in `public/portfolio/profile/portrait.webp`, then update its path in `components/Header.tsx` and `app/contact/page.tsx`.
+For a no-cost initial setup, create an R2 bucket, upload the folders above, and enable its public development URL. It is rate-limited and intended for development; for the public site, connect a custom subdomain you already own (for example, `media.your-domain.com`). [Cloudflare's public-bucket guide](https://developers.cloudflare.com/r2/buckets/public-buckets/)

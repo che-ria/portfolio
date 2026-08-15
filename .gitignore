@@ -5,3 +5,5 @@ out/
 .env*
 !.env.example
 screenshots/
+public/art/
+public/portfolio/

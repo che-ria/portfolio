@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Sulphur_Point } from "next/font/google";
-import "@fontsource/sn-pro/200.css";
-import "@fontsource/sn-pro/600.css";
+import { Barrio, Sour_Gummy } from "next/font/google";
 import { BackToTop } from "@/components/BackToTop";
 import { Header } from "@/components/Header";
 import "./globals.css";
 
-const display = Sulphur_Point({ subsets: ["latin"], variable: "--font-display", weight: "700", display: "swap" });
+const barrio = Barrio({ subsets: ["latin"], variable: "--font-barrio", weight: "400", display: "swap" });
+const sourGummy = Sour_Gummy({ subsets: ["latin"], variable: "--font-sour-gummy", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Daryna Chernysheva — Portfolio", template: "%s — Daryna Chernysheva" },
@@ -14,5 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" data-scroll-behavior="smooth"><body className={display.variable}><a className="skip-link" href="#content">Skip to content</a><Header />{children}<BackToTop /></body></html>;
+  return <html lang="en" data-scroll-behavior="smooth"><body className={`${barrio.variable} ${sourGummy.variable}`}><a className="skip-link" href="#content">Skip to content</a><Header />{children}<BackToTop /></body></html>;
 }

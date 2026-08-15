@@ -29,11 +29,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return <main id="content" className="project-page textured-section">
     <nav className="project-switcher" aria-label="Project navigation">
-      {previous ? <Link href={`/projects/${previous.id}`} aria-label={`Previous project: ${previous.title}`}><FiArrowLeft aria-hidden="true" /><small>Previous</small></Link> : <span aria-hidden="true" />}
-      <div><h1>{project.title}</h1></div>
-      {next ? <Link href={`/projects/${next.id}`} aria-label={`Next project: ${next.title}`}><small>Next</small><FiArrowRight aria-hidden="true" /></Link> : <span aria-hidden="true" />}
+      {previous ? <Link href={`/projects/${previous.id}`} aria-label={`Previous project: ${previous.title}`}><FiArrowLeft aria-hidden="true" /><span>Previous</span></Link> : <span aria-hidden="true" />}
+      <h1>{project.title}</h1>
+      {next ? <Link href={`/projects/${next.id}`} aria-label={`Next project: ${next.title}`}><span>Next</span><FiArrowRight aria-hidden="true" /></Link> : <span aria-hidden="true" />}
     </nav>
-    <ProjectGallery images={projectImages[project.id]} title={project.title} />
+    <ProjectGallery images={projectImages[project.id]} title={project.title} featuredFirst />
     <div className="project-back"><Link className="ornate-button" href="/"><FiArrowLeft aria-hidden="true" /> All projects</Link></div>
     <Footer />
   </main>;

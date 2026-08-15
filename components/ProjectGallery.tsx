@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { FiArrowLeft, FiArrowRight, FiX } from "react-icons/fi";
+import { FiAlertTriangle, FiArrowLeft, FiArrowRight, FiX } from "react-icons/fi";
 import {
+  Fragment,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type WheelEvent as ReactWheelEvent,
@@ -12,16 +13,14 @@ import {
 } from "react";
 import type { ProjectImage } from "@/data/site";
 
-const responsiveSizes = (orientation: ProjectImage["orientation"]) => orientation === "landscape"
-  ? "(max-width: 700px) 100vw, 1220px"
-  : "(max-width: 700px) 50vw, 602px";
-
 const clampZoom = (value: number) => Math.min(4, Math.max(1, value));
 
-export function ProjectGallery({ images, title }: { images: ProjectImage[]; title: string }) {
+export function ProjectGallery({ images, title, layout = "grid", featuredFirst = false }: { images: ProjectImage[]; title: string; layout?: "grid" | "masonry"; featuredFirst?: boolean }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [zoom, setZoom] = useState(1);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+  const [wideImages, setWideImages] = useState<Record<number, boolean>>({});
+  const [revealedMatureIndex, setRevealedMatureIndex] = useState<number | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -33,11 +32,13 @@ export function ProjectGallery({ images, title }: { images: ProjectImage[]; titl
   const show = (index: number, trigger: HTMLButtonElement) => {
     resetZoom();
     triggerRef.current = trigger;
+    setRevealedMatureIndex(images[index].mature ? index : null);
     setSelected(index);
   };
 
   const move = (direction: number) => {
     resetZoom();
+    setRevealedMatureIndex(null);
     setSelected((current) => current === null ? null : (current + direction + images.length) % images.length);
   };
 
@@ -78,14 +79,17 @@ export function ProjectGallery({ images, title }: { images: ProjectImage[]; titl
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         resetZoom();
+        setRevealedMatureIndex(null);
         setSelected(null);
       }
       if (event.key === "ArrowRight") {
         resetZoom();
+        setRevealedMatureIndex(null);
         setSelected((current) => current === null ? null : (current + 1) % images.length);
       }
       if (event.key === "ArrowLeft") {
         resetZoom();
+        setRevealedMatureIndex(null);
         setSelected((current) => current === null ? null : (current - 1 + images.length) % images.length);
       }
     };
@@ -100,21 +104,39 @@ export function ProjectGallery({ images, title }: { images: ProjectImage[]; titl
 
   const selectedIndex = selected ?? 0;
   const current = selected === null ? null : images[selectedIndex];
+  const matureContentHidden = current?.mature && revealedMatureIndex !== selectedIndex;
+  const standaloneIndexes = layout === "grid" ? (() => {
+    const indexes = new Set<number>();
+    let occupiedColumns = 0;
+    images.forEach((image, index) => {
+      if (image.sectionTitle || (featuredFirst && index === 0) || image.centered || image.fullWidth) occupiedColumns = 0;
+      if (featuredFirst && index === 0 || image.centered || image.fullWidth) return;
+      const next = images[index + 1];
+      if (occupiedColumns === 0 && (!next || next.sectionTitle || next.centered)) indexes.add(index);
+      occupiedColumns = (occupiedColumns + 1) % 2;
+    });
+    return indexes;
+  })() : new Set<number>();
 
   return <>
-    <div className="project-gallery">
-      {images.map((image, index) => <button className={`project-shot ${index === 0 ? "project-shot-hero" : ""} ${image.orientation}`} key={`${image.src}-${index}`} onClick={(event) => show(index, event.currentTarget)} aria-label={`Open image ${index + 1}${image.caption ? `: ${image.caption}` : ""}`}>
-        <span className="project-shot-image"><Image src={image.src} alt="" fill quality={95} sizes={responsiveSizes(image.orientation)} /></span>
+    <div className={`project-gallery ${layout === "masonry" ? "is-masonry" : ""}`}>
+      {images.map((image, index) => <Fragment key={`${image.src}-${index}`}>
+        {image.sectionTitle && <h2 className="project-gallery-section-title">{image.sectionTitle}</h2>}
+        <button className={`project-shot ${featuredFirst && index === 0 ? "project-shot-hero" : ""} ${image.fullWidth ? "is-full-width" : ""} ${image.centered || standaloneIndexes.has(index) ? "is-standalone" : ""} ${image.mature ? "is-mature" : ""} ${wideImages[index] ? "is-wide" : "is-paired"}`} onClick={(event) => show(index, event.currentTarget)} aria-label={`Open image ${index + 1}${image.caption ? `: ${image.caption}` : ""}`}>
+        <span className="project-shot-image"><Image src={image.src} alt="" width={2000} height={2000} quality={95} sizes="(max-width: 700px) 100vw, 1220px" onLoad={(event) => { const byName = /(?:^|[_-])wide(?:[_.\-]|$)/i.test(image.src); const isWide = byName || event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5; setWideImages((current) => current[index] === isWide ? current : { ...current, [index]: isWide }); }} /></span>
+        {image.mature && <span className="mature-content-card-notice" aria-hidden="true"><FiAlertTriangle /><span>Mature Content</span><small>Click to Show</small></span>}
         <span className="project-shot-caption" aria-hidden="true">{image.caption}</span>
-      </button>)}
+        </button>
+      </Fragment>)}
     </div>
-    {current && <div className="lightbox project-lightbox" role="dialog" aria-modal="true" aria-label={current.caption || `${title} image ${selectedIndex + 1}`} onKeyDown={trapFocus} onMouseDown={(event) => { if (event.target === event.currentTarget) { resetZoom(); setSelected(null); } }}>
-      <button ref={closeRef} className="lightbox-close" onClick={() => { resetZoom(); setSelected(null); }} aria-label="Close image"><FiX aria-hidden="true" /></button>
+    {current && <div className="lightbox project-lightbox" role="dialog" aria-modal="true" aria-label={current.caption || `${title} image ${selectedIndex + 1}`} onKeyDown={trapFocus} onMouseDown={(event) => { if (event.target === event.currentTarget) { resetZoom(); setRevealedMatureIndex(null); setSelected(null); } }}>
+      <button ref={closeRef} className="lightbox-close" onClick={() => { resetZoom(); setRevealedMatureIndex(null); setSelected(null); }} aria-label="Close image"><FiX aria-hidden="true" /></button>
       <button className="lightbox-arrow prev" onClick={() => move(-1)} aria-label="Previous image">
         <FiArrowLeft aria-hidden="true" />
       </button>
-      <figure className={zoom > 1 ? "is-zoomed" : undefined} tabIndex={0} role="button" aria-label="Click to zoom. Use the mouse wheel to adjust the zoom." onClick={toggleZoom} onWheel={wheelZoom} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setZoom((value) => value === 1 ? 2 : 1); } }}>
+      <figure className={`${zoom > 1 ? "is-zoomed " : ""}${matureContentHidden ? "is-mature-hidden" : ""}`} tabIndex={matureContentHidden ? undefined : 0} role={matureContentHidden ? undefined : "button"} aria-label={matureContentHidden ? undefined : "Click to zoom. Use the mouse wheel to adjust the zoom."} onClick={matureContentHidden ? undefined : toggleZoom} onWheel={matureContentHidden ? undefined : wheelZoom} onKeyDown={matureContentHidden ? undefined : (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setZoom((value) => value === 1 ? 2 : 1); } }}>
         <Image src={current.src} alt={current.alt} fill unoptimized sizes="100vw" style={{ transform: `scale(${zoom})`, transformOrigin: zoomOrigin }} />
+        {matureContentHidden && <button className="mature-content-reveal" onClick={() => setRevealedMatureIndex(selectedIndex)}><FiAlertTriangle aria-hidden="true" /><span>Mature Content</span><small>Click to Show</small></button>}
         <figcaption>{current.caption}<small>{selectedIndex + 1} / {images.length} · {Math.round(zoom * 100)}%</small></figcaption>
       </figure>
       <button className="lightbox-arrow next" onClick={() => move(1)} aria-label="Next image">
