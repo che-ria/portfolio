@@ -34,12 +34,10 @@ const projectMeta = [
   { id: "cozy-tiny-home", title: "Cozy Tiny Home", cover: "cover/cover.jpg", logo: "logo/logo.png" },
   { id: "cottonville", title: "Cottonville", cover: "cover/cover.png", logo: "logo/logo.png" },
   { id: "neko-gelato", title: "Neko Gelato", cover: "cover/cover.png", logo: "logo/logo.png" },
-  { id: "cozy-packing", title: "Cozy Packing", cover: "cover/cover.png", logo: "logo/logo.png" },
   { id: "summer-unpacked", title: "Summer Unpacked", cover: "cover/cover.png", logo: "logo/Logo.png" },
   { id: "cozy-cooking", title: "Cozy Cooking", cover: "cover/cover.png", logo: "logo/logo.png" },
   { id: "love-elysium", title: "Love Elysium", cover: "cover/cover.png", logo: "logo/logo.png" },
   { id: "hentai-golf", title: "Hentai Golf", cover: "cover/cover.png", logo: "logo/logo.png" },
-  { id: "hentai-fantasy", title: "Hentai Fantasy", cover: "cover/cover.png", logo: "logo/logo_eng.png" },
   { id: "hentai-girls", title: "Hentai Girls", cover: "cover/cover.png", logo: "logo/logo.png" },
 ] as const;
 
@@ -93,10 +91,6 @@ export const projectImages: Record<string, ProjectImage[]> = {
   "neko-gelato": gallery("neko-gelato", ["00_EkranPowitalny_eng.png", ...numbered(7, (index) => `${pad(index + 1)}_concepts_${pad(index + 1)}.png`)], {
     "01_concepts_01.png": { sectionTitle: "Game Assets" },
   }),
-  "cozy-packing": gallery("cozy-packing", [...numbered(12, (index) => `${pad(index + 1)}_concept_${index + 5}.png`), ...numbered(4, (index) => `${pad(index + 13)}_concept_${index + 1}.png`), "17_menu.png", "18_controls.png", "19_pause.png", "20_settings.png"], {
-    "02_concept_6.png": { sectionTitle: "Level Concepts" },
-    "17_menu.png": { sectionTitle: "Screens & UI Concepts" },
-  }),
   "summer-unpacked": gallery("summer-unpacked", ["01_SM_01.png", "02_SM_02.png", "03_SM_03.png", "04_SM_04.png", "05_SM_05.png", "06_SM_12.png", "07_SM_06.png", "08_SM_11.png", "09_SM_08.png", "10_SM_10.png", "11_SM_07.png", "12_SM_13.png", "13_SM_09.png"], {
     "01_SM_01.png": { sectionTitle: "Level Concepts" },
   }),
@@ -125,9 +119,6 @@ export const projectImages: Record<string, ProjectImage[]> = {
   }),
   "hentai-golf": gallery("hentai-golf", ["01_gf.png", ...numbered(18, (index) => `golf_${pad(index + 1)}.png`)], {
     "golf_01.png": { sectionTitle: "Game Illustrations" },
-  }),
-  "hentai-fantasy": gallery("hentai-fantasy", ["01_banner_jap.jpg", "black_girl.png", "black_girl01.png", "black_girl02.png", "blue_girl.png", "blue_girl01.png", "blue_girl02.png", "red_girl.png", "red_girl01.png", "red_girl02.png", "x_menu.png"], {
-    "black_girl.png": { sectionTitle: "Game Illustrations" },
   }),
   "hentai-girls": gallery("hentai-girls", ["01_banner_eng.jpg", ...numbered(6, (index) => `HG_0${index + 1}.png`)], {
     "HG_01.png": { sectionTitle: "Game Illustrations" },
