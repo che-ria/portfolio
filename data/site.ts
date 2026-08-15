@@ -1,3 +1,4 @@
+import { type ImageSize, imageSize } from "./image-size";
 import { mediaUrl } from "./media";
 
 export type { NavItem } from "./navigation";
@@ -9,6 +10,8 @@ export interface Project {
   description: string;
   cover: string;
   logo?: string;
+  /** Height of the logo box on a card, as a percentage — see `logoBoxHeight`. */
+  logoHeight?: number;
 }
 
 /**
@@ -21,6 +24,12 @@ export interface Project {
 export interface ProjectImage {
   src: string;
   alt: string;
+  /**
+   * Intrinsic `[width, height]`, from the generated table in `image-size.ts`.
+   * Absent only when the file could not be read from the bucket, in which case
+   * the gallery falls back to a 4:3 placeholder box.
+   */
+  size?: ImageSize;
   caption?: string;
   sectionTitle?: string;
   centered?: boolean;
@@ -41,26 +50,54 @@ const projectMeta = [
   { id: "hentai-girls", title: "Hentai Girls", cover: "cover/cover.png", logo: "logo/logo.png" },
 ] as const;
 
-export const projects: Project[] = projectMeta.map(({ id, title, cover, logo }) => ({
-  id,
-  title,
-  description: "A selected portfolio project by Daryna Chernysheva.",
-  cover: mediaUrl(`/portfolio/projects/${id}/${cover}`),
-  logo: mediaUrl(`/portfolio/projects/${id}/${logo}`),
-}));
+/**
+ * How tall a card's logo box should be, as a percentage of the card.
+ *
+ * The box is a fixed share of the card wide, so `object-fit: contain` sizes a
+ * wide wordmark by that width and a squarer mark by the box height instead — at
+ * the flat 64% the box used to have, a square mark (Neko Gelato, Love Elysium)
+ * came out half the width of a 2:1 one and read as an afterthought beside it.
+ * Growing the box by `ar^-1/4` — 64% at 2:1, 76% at 1:1 — hands the squarer
+ * marks back most of that width. It deliberately stops short of matching the
+ * wide marks' *area*: on a 16:9 card that would take ~90% of the card height and
+ * leave a square mark almost no margin above or below. Anything wider than 2:1
+ * is pinned by the box width however short the box gets, so those are clamped at
+ * 64% rather than allowed to trail off.
+ */
+const logoBoxHeight = (size: ImageSize | undefined) => size && Math.round(Math.max(64, 76 / (size[0] / size[1]) ** .25));
+
+/**
+ * Logos whose file carries a transparent margin the shape alone cannot reveal.
+ * Love Elysium's mark covers 83% × 73% of its 2000 × 2000 canvas, so the box it
+ * earns as a "square" logo is spent partly on empty pixels and the ink lands a
+ * quarter shorter than Neko Gelato's. The box is grown until the two marks read
+ * the same size; trim the canvas and this entry can go.
+ */
+const logoBoxOverride: Record<string, number> = { "love-elysium": 88 };
+
+export const projects: Project[] = projectMeta.map(({ id, title, cover, logo }) => {
+  const logoSrc = mediaUrl(`/portfolio/projects/${id}/${logo}`);
+  return {
+    id,
+    title,
+    description: "A selected portfolio project by Daryna Chernysheva.",
+    cover: mediaUrl(`/portfolio/projects/${id}/${cover}`),
+    logo: logoSrc,
+    logoHeight: logoBoxOverride[id] ?? logoBoxHeight(imageSize(logoSrc)),
+  };
+});
 
 const projectTitles = new Map<string, string>(projectMeta.map(({ id, title }) => [id, title]));
 
-const gallery = (projectId: string, files: string[], options: GalleryOptions = {}): ProjectImage[] => files.map((file) => ({
-  src: mediaUrl(`/portfolio/projects/${projectId}/gallery/${file}`),
-  alt: `${projectTitles.get(projectId) ?? "Project"} artwork`,
-  ...options[file],
-}));
-
-const artwork = (folder: string, alt: string) => (file: string): ProjectImage => ({
-  src: mediaUrl(`/portfolio/${folder}/${file}`),
-  alt,
+const gallery = (projectId: string, files: string[], options: GalleryOptions = {}): ProjectImage[] => files.map((file) => {
+  const src = mediaUrl(`/portfolio/projects/${projectId}/gallery/${file}`);
+  return { src, alt: `${projectTitles.get(projectId) ?? "Project"} artwork`, size: imageSize(src), ...options[file] };
 });
+
+const artwork = (folder: string, alt: string) => (file: string): ProjectImage => {
+  const src = mediaUrl(`/portfolio/${folder}/${file}`);
+  return { src, alt, size: imageSize(src) };
+};
 
 const numbered = (count: number, name: (index: number) => string) => Array.from({ length: count }, (_, index) => name(index));
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -74,15 +111,11 @@ export const marketingArtworks: ProjectImage[] = [
 ].map(artwork("marketing-art", "Marketing artwork by Daryna Chernysheva"));
 
 export const projectImages: Record<string, ProjectImage[]> = {
-  "cozy-tiny-home": gallery("cozy-tiny-home", ["01.avif", "02_room30.png", "03_room21.png", "04_pinkroom.png", "05_room25.png", "06_room09.png", "07_room27.png", "08_room04.png", "09_room01.png", "10_character2.png", "11_character3.png", "12_character.png", "13_character1.png", "14_character4.png", "15_bed.png", "16_bed1.png", "17_bed2.png", "18_cabinet.png", "19_cabinet1.png", "20_cabinet2.png", "21_carpet.png", "22_bath.png", "23_bath1.png", "24_bath2.png", "25_device.png", "26_device1.png", "27_device2.png", "28_door.png", "29_door1.png", "30_door2.png", "31_table.png", "32_table1.png", "33_table2.png", "34_DLC_room_christmas.png", "35_christmas.png", "36_christmas1.png", "37_DLC_room_winter.png", "38_winter.png", "39_winter1.png", "40_DLC_room_magic.png", "41_magic.png", "42_magic1.png", "43_DLC_room_spa.png", "44_spa.png", "45_spa1.png", "46_spa2.png", "47_DLC_room_pets.png", "48_pets.png", "49_pets1.png", "50_DLC_room_japan.png", "51_japan.png", "52_japan1.png", "53_japan2.png", "54_DLC_room_tropical.png", "55_tropical.png", "56_tropical1.png", "57_tropical2.png"], {
+  "cozy-tiny-home": gallery("cozy-tiny-home", ["01.avif", "02_room30.png", "03_room21.png", "04_pinkroom.png", "05_room25.png", "06_room09.png", "07_room27.png", "08_room04.png", "09_room01.png", "10_character2.png", "11_character3.png", "12_character.png", "13_character1.png", "14_character4.png", "15_bed.png", "16_bed1.png", "17_bed2.png", "18_cabinet.png", "19_cabinet1.png", "20_cabinet2.png", "21_carpet.png", "22_bath.png", "23_bath1.png", "24_bath2.png", "25_device.png", "26_device1.png", "27_device2.png", "28_door.png", "29_door1.png", "30_door2.png", "31_table.png", "32_table1.png", "33_table2.png", "34_DLC_room_christmas.png", "35_christmas.png", "36_christmas1.png", "37_DLC_room_winter.png", "38_winter.png", "39_winter1.png", "50_DLC_room_japan.png", "51_japan.png", "52_japan1.png", "53_japan2.png"], {
     "10_character2.png": { sectionTitle: "Game Assets" },
     "34_DLC_room_christmas.png": { sectionTitle: "Special Game Assets", centered: true },
     "37_DLC_room_winter.png": { centered: true },
-    "40_DLC_room_magic.png": { centered: true },
-    "43_DLC_room_spa.png": { centered: true },
-    "47_DLC_room_pets.png": { centered: true },
     "50_DLC_room_japan.png": { centered: true },
-    "54_DLC_room_tropical.png": { centered: true },
   }),
   cottonville: gallery("cottonville", numbered(33, (index) => `${pad(index + 1)}.png`), {
     "05.png": { sectionTitle: "Game Assets" },

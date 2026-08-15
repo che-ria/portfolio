@@ -1,238 +1,235 @@
 "use client";
 
-import Image from "next/image";
-import { FiAlertTriangle, FiArrowLeft, FiArrowRight, FiX } from "react-icons/fi";
-import {
-  Fragment,
-  memo,
-  type KeyboardEvent as ReactKeyboardEvent,
-  type MouseEvent as ReactMouseEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { FiAlertTriangle, FiArrowLeft, FiArrowRight, FiImage, FiMinus, FiPlus, FiX } from "react-icons/fi";
+import { Fragment, memo, useCallback, useMemo, useState, type CSSProperties } from "react";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
+import { LightboxCaption, LightboxImage, MatureLightboxPrompt } from "@/components/LightboxImage";
+import { useMatureGate } from "@/components/MatureGate";
+import { MediaImage } from "@/components/MediaImage";
 import type { ProjectImage } from "@/data/site";
 
-const clampZoom = (value: number) => Math.min(4, Math.max(1, value));
-
 type Layout = "grid" | "masonry";
+
+/** Shape assumed for the handful of images whose size could not be read. */
+const FALLBACK_SIZE: [number, number] = [1600, 1200];
+
+const sizeOf = (image: ProjectImage) => image.size ?? FALLBACK_SIZE;
+const ratioOf = (image: ProjectImage) => { const [width, height] = sizeOf(image); return width / height; };
+
+/**
+ * A piece counts as wide when it is at least 3:2, which in the masonry layout
+ * earns it two columns. The name check covers exports that are panoramic by
+ * intent even when the canvas is not.
+ *
+ * This used to be measured in the browser from `onLoad`, which meant the whole
+ * gallery re-flowed once per image as the downloads landed. The intrinsic sizes
+ * now ship with the page, so the layout is final on the first paint.
+ */
+const isWide = (image: ProjectImage) => /(?:^|[_-])wide(?:[_.\-]|$)/i.test(image.src) || ratioOf(image) >= 1.5;
+
+/**
+ * How the collage packs.
+ *
+ * A plain column grid gives every tile in a row the height of the tallest one,
+ * and the illustrations are 2:3 portraits with three panoramas and a square
+ * among them — so each of those left half a column of white under its
+ * neighbours. Masonry closes that, and the way to get real masonry without
+ * measuring anything in the browser is to lay the grid out in rows a hundredth
+ * of a column tall and give each tile a span computed from the intrinsic size
+ * that already ships with the page.
+ *
+ * Both numbers are shared with `.project-gallery.is-masonry` in `globals.css`
+ * and only mean the same thing while they agree. `GAP_SHARE` is the gutter as a
+ * fraction of one column — 4% is the 1rem gutter the gallery already had at its
+ * full 1220px width, expressed in a way that does not change with the column
+ * count, which is what keeps one span correct at every breakpoint.
+ */
+const GAP_SHARE = 0.04;
+const ROWS_PER_COLUMN = 100;
+
+/**
+ * Rows a tile occupies: its own height plus the gutter below it, measured in
+ * column widths. Rounded up, so the error is at most one row — a few pixels of
+ * extra gutter, never a tile clipped by the one beneath it.
+ */
+const rowSpan = (image: ProjectImage, wide: boolean) => {
+  // A wide piece is two columns *and* the gutter between them.
+  const width = wide ? 2 + GAP_SHARE : 1;
+  return Math.ceil(ROWS_PER_COLUMN * (width / ratioOf(image) + GAP_SHARE));
+};
 
 /**
  * `sizes` has to describe the slot the image actually occupies, not the widest
  * slot in the gallery. The grid is `min(1220px, 100% - 3rem)` wide: two columns
- * on desktop, one below 700px. Overstating this makes the browser pick a 1920px
- * or 3840px candidate for a ~600px slot, which is the single largest source of
+ * on desktop, one below 700px. The masonry gallery is three columns above
+ * 900px and two below, so a wide piece spanning two of them is roughly double
+ * a normal tile. Overstating any of this makes the browser pick a 1920px or
+ * 3840px candidate for a ~400px slot, which is the single largest source of
  * wasted bytes on these pages.
  *
  * Widths are given in px rather than `calc()`/fractional `vw`: next/image only
  * recognises a bare `<n>vw` token when trimming the srcset, so `calc(50vw - 1rem)`
  * makes it emit every candidate down to 32w — markup no browser can ever use.
  */
-const tileSizes = (layout: Layout, spansFullWidth: boolean) => {
-  if (layout === "masonry") return "(max-width: 700px) 100vw, (max-width: 900px) 420px, 812px";
+const tileSizes = (layout: Layout, spansFullWidth: boolean, wide: boolean) => {
+  if (layout === "masonry") {
+    return wide
+      ? "(max-width: 700px) 100vw, (max-width: 900px) 780px, 810px"
+      : "(max-width: 700px) 100vw, (max-width: 900px) 390px, 400px";
+  }
   if (spansFullWidth) return "(max-width: 700px) 100vw, 1220px";
   return "(max-width: 700px) 100vw, 610px";
 };
 
 /**
- * Memoised so that a `wideImages` update from one image's `onLoad` does not
- * force React to reconcile every other tile in a 57-image gallery.
+ * Memoised so that opening the lightbox, or one tile finishing its download,
+ * does not reconcile every other tile in a 57-image gallery.
  */
-const GalleryTile = memo(function GalleryTile({ image, index, className, sizes, measure, onOpen }: {
+const GalleryTile = memo(function GalleryTile({ image, index, className, sizes, span, locked, onOpen }: {
   image: ProjectImage;
   index: number;
   className: string;
   sizes: string;
-  measure: ((index: number, isWide: boolean) => void) | null;
-  onOpen: (index: number, trigger: HTMLButtonElement) => void;
+  /** Rows to occupy in the collage. Absent in the plain grid, which has none. */
+  span?: number;
+  /** Flagged mature and not yet confirmed: covered, and opening it asks first. */
+  locked: boolean;
+  onOpen: (index: number) => void;
 }) {
-  return <button className={className} onClick={(event) => onOpen(index, event.currentTarget)} aria-label={`Open image ${index + 1}${image.caption ? `: ${image.caption}` : ""}`}>
-    <span className="project-shot-image">
-      <Image
+  const [width, height] = sizeOf(image);
+
+  return <button
+    className={className}
+    // Built here rather than passed in: a fresh object from the parent on every
+    // render would defeat the memo this component exists for.
+    style={span ? { "--span": span } as CSSProperties : undefined}
+    onClick={() => onOpen(index)}
+    aria-label={locked ? `Mature content, image ${index + 1}. Opens a confirmation first.` : `Open image ${index + 1}${image.caption ? `: ${image.caption}` : ""}`}
+  >
+    {/* The wrapper carries the artwork's real aspect ratio so the skeleton
+        occupies exactly the space the image will take — the layout is settled
+        before a single byte of artwork arrives. */}
+    <span className="project-shot-image" style={{ aspectRatio: width / height }}>
+      <MediaImage
         src={image.src}
         alt=""
-        width={2000}
-        height={2000}
-        quality={95}
+        width={width}
+        height={height}
         sizes={sizes}
-        onLoad={measure ? (event) => {
-          const byName = /(?:^|[_-])wide(?:[_.\-]|$)/i.test(image.src);
-          measure(index, byName || event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5);
-        } : undefined}
+        fallback={<span className="project-shot-missing" aria-hidden="true"><FiImage /></span>}
       />
     </span>
-    {image.mature && <span className="mature-content-card-notice" aria-hidden="true"><FiAlertTriangle /><span>Mature Content</span><small>Click to Show</small></span>}
+    {locked && <span className="mature-content-card-notice" aria-hidden="true"><FiAlertTriangle /><span>Mature Content</span><small>Click to confirm</small></span>}
     <span className="project-shot-caption" aria-hidden="true">{image.caption}</span>
   </button>;
 });
 
 export function ProjectGallery({ images, title, layout = "grid", featuredFirst = false }: { images: ProjectImage[]; title: string; layout?: Layout; featuredFirst?: boolean }) {
-  const [selected, setSelected] = useState<number | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
-  const [wideImages, setWideImages] = useState<Record<number, boolean>>({});
-  const [revealedMatureIndex, setRevealedMatureIndex] = useState<number | null>(null);
-  const closeRef = useRef<HTMLButtonElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const figureRef = useRef<HTMLElement>(null);
+  // -1 is closed. Everything the viewer does once it is open — swipe, pinch,
+  // wheel-zoom, arrow keys, Escape, the scroll lock, the focus trap and handing
+  // focus back to the tile on close — belongs to the lightbox from here on.
+  const [index, setIndex] = useState(-1);
+  const { consent, confirm } = useMatureGate();
+  const close = useCallback(() => setIndex(-1), []);
 
-  const isOpen = selected !== null;
+  // Opening a flagged tile asks before it shows anything. Once the viewer has
+  // said yes the answer holds for the session, so this is a question they meet
+  // once rather than on every piece.
+  const open = useCallback(async (next: number) => {
+    if (images[next]?.mature && consent !== "granted" && !(await confirm())) return;
+    setIndex(next);
+  }, [images, consent, confirm]);
 
-  const resetZoom = useCallback(() => {
-    setZoom(1);
-    setZoomOrigin("50% 50%");
-  }, []);
+  const wideFlags = useMemo(() => images.map(isWide), [images]);
 
-  const close = useCallback(() => {
-    resetZoom();
-    setRevealedMatureIndex(null);
-    setSelected(null);
-  }, [resetZoom]);
+  const slotSizes = useMemo(
+    () => images.map((image, position) => tileSizes(layout, (featuredFirst && position === 0) || !!image.fullWidth, wideFlags[position])),
+    [images, layout, featuredFirst, wideFlags],
+  );
 
-  const show = useCallback((index: number, trigger: HTMLButtonElement) => {
-    resetZoom();
-    triggerRef.current = trigger;
-    setRevealedMatureIndex(images[index].mature ? index : null);
-    setSelected(index);
-  }, [images, resetZoom]);
+  const spans = useMemo(
+    () => (layout === "masonry" ? images.map((image, position) => rowSpan(image, wideFlags[position])) : null),
+    [images, layout, wideFlags],
+  );
 
-  const move = useCallback((direction: number) => {
-    resetZoom();
-    setRevealedMatureIndex(null);
-    setSelected((current) => current === null ? null : (current + direction + images.length) % images.length);
-  }, [images.length, resetZoom]);
-
-  // Only the masonry layout reacts to an image being wide (`is-wide` spans two
-  // columns there). In the two-column grid `is-wide` resolves to the same
-  // `grid-column: span 1` as the base rule, so measuring would cost one state
-  // update per image for no visible effect.
-  const measure = useMemo(() => layout !== "masonry" ? null : (index: number, isWide: boolean) => {
-    setWideImages((current) => current[index] === isWide ? current : { ...current, [index]: isWide });
-  }, [layout]);
-
-  const setOriginFromPointer = useCallback((clientX: number, clientY: number, element: HTMLElement) => {
-    const bounds = element.getBoundingClientRect();
-    setZoomOrigin(`${((clientX - bounds.left) / bounds.width) * 100}% ${((clientY - bounds.top) / bounds.height) * 100}%`);
-  }, []);
-
-  const toggleZoom = (event: ReactMouseEvent<HTMLElement>) => {
-    setOriginFromPointer(event.clientX, event.clientY, event.currentTarget);
-    setZoom((current) => current === 1 ? 2 : 1);
-  };
-
-  const trapFocus = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Tab") return;
-    const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("button:not(:disabled), [href], [tabindex]:not([tabindex='-1'])"));
-    const first = focusable[0];
-    const last = focusable.at(-1);
-    if (!first || !last) return;
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-    if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-  };
-
-  // Keyed on `isOpen` rather than `selected`: keying on the index re-ran the
-  // cleanup on every arrow press, which handed focus back to the grid button
-  // behind the dialog and scrolled the page under it.
-  useEffect(() => {
-    if (!isOpen) return;
-    // Lock the root, not the body: globals.css gives <html> `overflow-y: scroll`,
-    // which makes it the scroll container, so hiding body overflow would no
-    // longer stop the page behind the dialog from scrolling.
-    const root = document.documentElement;
-    const { overflow: previousOverflow, paddingRight: previousPadding } = root.style;
-    // Hiding overflow reclaims the scrollbar track; pad by the same width so the
-    // page underneath does not jump sideways as the dialog opens.
-    const trackWidth = window.innerWidth - root.clientWidth;
-    root.style.overflow = "hidden";
-    if (trackWidth > 0) root.style.paddingRight = `${trackWidth}px`;
-    closeRef.current?.focus();
-    return () => {
-      root.style.overflow = previousOverflow;
-      root.style.paddingRight = previousPadding;
-      triggerRef.current?.focus();
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-      if (event.key === "ArrowRight") move(1);
-      if (event.key === "ArrowLeft") move(-1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, close, move]);
-
-  // React registers `wheel` on the root as a passive listener, so an onWheel
-  // handler cannot call preventDefault(). Bind it directly to keep the browser
-  // from scrolling (or page-zooming) while the pointer is over the image.
-  useEffect(() => {
-    const figure = figureRef.current;
-    if (!figure) return;
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      setOriginFromPointer(event.clientX, event.clientY, figure);
-      setZoom((current) => clampZoom(current + (event.deltaY < 0 ? 0.25 : -0.25)));
-    };
-    figure.addEventListener("wheel", onWheel, { passive: false });
-    return () => figure.removeEventListener("wheel", onWheel);
-  }, [isOpen, setOriginFromPointer]);
-
-  const selectedIndex = selected ?? 0;
-  const current = selected === null ? null : images[selectedIndex];
-  const matureContentHidden = current?.mature && revealedMatureIndex !== selectedIndex;
+  const slides = useMemo(() => images.map((image, position) => {
+    const [width, height] = sizeOf(image);
+    // The tile's `sizes` travels with the slide so the lightbox can request the
+    // exact candidate this image's tile already downloaded.
+    return { src: image.src, alt: image.alt, width, height, tileSizes: slotSizes[position], caption: image.caption, mature: image.mature };
+  }), [images, slotSizes]);
 
   const standaloneIndexes = useMemo(() => {
     if (layout !== "grid") return new Set<number>();
     const indexes = new Set<number>();
     let occupiedColumns = 0;
-    images.forEach((image, index) => {
-      if (image.sectionTitle || (featuredFirst && index === 0) || image.centered || image.fullWidth) occupiedColumns = 0;
-      if (featuredFirst && index === 0 || image.centered || image.fullWidth) return;
-      const next = images[index + 1];
-      if (occupiedColumns === 0 && (!next || next.sectionTitle || next.centered)) indexes.add(index);
+    images.forEach((image, position) => {
+      if (image.sectionTitle || (featuredFirst && position === 0) || image.centered || image.fullWidth) occupiedColumns = 0;
+      if (featuredFirst && position === 0 || image.centered || image.fullWidth) return;
+      const next = images[position + 1];
+      if (occupiedColumns === 0 && (!next || next.sectionTitle || next.centered)) indexes.add(position);
       occupiedColumns = (occupiedColumns + 1) % 2;
     });
     return indexes;
   }, [images, layout, featuredFirst]);
 
+  const gallery = <div className={`project-gallery ${layout === "masonry" ? "is-masonry" : ""}`}>
+    {images.map((image, position) => {
+      const isHero = featuredFirst && position === 0;
+      const locked = !!image.mature && consent !== "granted";
+      return <Fragment key={`${image.src}-${position}`}>
+        {image.sectionTitle && <h2 className="project-gallery-section-title">{image.sectionTitle}</h2>}
+        <GalleryTile
+          image={image}
+          index={position}
+          className={`project-shot ${isHero ? "project-shot-hero" : ""} ${image.fullWidth ? "is-full-width" : ""} ${image.centered || standaloneIndexes.has(position) ? "is-standalone" : ""} ${locked ? "is-mature" : ""} ${wideFlags[position] ? "is-wide" : "is-paired"}`}
+          sizes={slotSizes[position]}
+          span={spans?.[position]}
+          locked={locked}
+          onOpen={open}
+        />
+      </Fragment>;
+    })}
+  </div>;
+
   return <>
-    <div className={`project-gallery ${layout === "masonry" ? "is-masonry" : ""}`}>
-      {images.map((image, index) => {
-        const isHero = featuredFirst && index === 0;
-        const spansFullWidth = isHero || !!image.fullWidth;
-        return <Fragment key={`${image.src}-${index}`}>
-          {image.sectionTitle && <h2 className="project-gallery-section-title">{image.sectionTitle}</h2>}
-          <GalleryTile
-            image={image}
-            index={index}
-            className={`project-shot ${isHero ? "project-shot-hero" : ""} ${image.fullWidth ? "is-full-width" : ""} ${image.centered || standaloneIndexes.has(index) ? "is-standalone" : ""} ${image.mature ? "is-mature" : ""} ${wideImages[index] ? "is-wide" : "is-paired"}`}
-            sizes={tileSizes(layout, spansFullWidth)}
-            measure={measure}
-            onOpen={show}
-          />
-        </Fragment>;
-      })}
-    </div>
-    {current && <div className="lightbox project-lightbox" role="dialog" aria-modal="true" aria-label={current.caption || `${title} image ${selectedIndex + 1}`} onKeyDown={trapFocus} onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
-      <button ref={closeRef} className="lightbox-close" onClick={close} aria-label="Close image"><FiX aria-hidden="true" /></button>
-      <button className="lightbox-arrow prev" onClick={() => move(-1)} aria-label="Previous image">
-        <FiArrowLeft aria-hidden="true" />
-      </button>
-      <figure ref={figureRef} className={`${zoom > 1 ? "is-zoomed " : ""}${matureContentHidden ? "is-mature-hidden" : ""}`} tabIndex={matureContentHidden ? undefined : 0} role={matureContentHidden ? undefined : "button"} aria-label={matureContentHidden ? undefined : "Click to zoom. Use the mouse wheel to adjust the zoom."} onClick={matureContentHidden ? undefined : toggleZoom} onKeyDown={matureContentHidden ? undefined : (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setZoom((value) => value === 1 ? 2 : 1); } }}>
-        {/* `sizes` deliberately overshoots the viewport so the browser picks a
-            candidate with headroom for the 4x zoom. Serving the untouched source
-            instead would mean multi-megabyte PNGs for a single view. */}
-        <Image src={current.src} alt={current.alt} fill quality={95} sizes="200vw" style={{ transform: `scale(${zoom})`, transformOrigin: zoomOrigin }} />
-        {matureContentHidden && <button className="mature-content-reveal" onClick={() => setRevealedMatureIndex(selectedIndex)}><FiAlertTriangle aria-hidden="true" /><span>Mature Content</span><small>Click to Show</small></button>}
-        <figcaption>{current.caption}<small>{selectedIndex + 1} / {images.length} · {Math.round(zoom * 100)}%</small></figcaption>
-      </figure>
-      <button className="lightbox-arrow next" onClick={() => move(1)} aria-label="Next image">
-        <FiArrowRight aria-hidden="true" />
-      </button>
-    </div>}
+    {/* The collage measures its rows against its own width, which only a
+        container query can express — and an element cannot query itself, hence
+        the wrapper. It carries the gallery's width so `100cqw` is the width the
+        columns are really laid out in. */}
+    {layout === "masonry" ? <div className="project-collage">{gallery}</div> : gallery}
+    <Lightbox
+      open={index >= 0}
+      index={index < 0 ? 0 : index}
+      close={close}
+      slides={slides}
+      plugins={[Zoom]}
+      className="project-lightbox"
+      // The originals run to ~4000px, so tying the ceiling to one image pixel
+      // per screen pixel would stop well short on a large display. Doubling it
+      // keeps roughly the 4x reach the gallery had before, and the `sizes` in
+      // `LightboxImage` fetches the detail to back it up.
+      zoom={{ maxZoomPixelRatio: 2, scrollToZoom: true, pinchZoomV4: true }}
+      controller={{ closeOnBackdropClick: true, closeOnPullDown: true }}
+      // Padding has to be given here rather than in CSS: the library both writes
+      // it into the slide's inline style and derives the rect it hands to
+      // `render.slide` from the same number, so a CSS override would size the
+      // artwork from a box wider than the one it is drawn in. A percentage is
+      // what makes it responsive — it resolves against the container width in
+      // JavaScript exactly as it does in CSS.
+      carousel={{ preload: 1, padding: "5%" }}
+      labels={{ Previous: "Previous image", Next: "Next image", Close: "Close image", "Photo gallery": title }}
+      render={{
+        slide: (props) => <LightboxImage {...props} />,
+        controls: () => <><LightboxCaption /><MatureLightboxPrompt /></>,
+        iconPrev: () => <FiArrowLeft />,
+        iconNext: () => <FiArrowRight />,
+        iconClose: () => <FiX />,
+        iconZoomIn: () => <FiPlus />,
+        iconZoomOut: () => <FiMinus />,
+      }}
+    />
   </>;
 }

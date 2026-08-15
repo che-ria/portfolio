@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { MediaImage } from "@/components/MediaImage";
 import { mediaUrl } from "@/data/media";
 import { navItems } from "@/data/navigation";
 
 export function Header() {
   const pathname = usePathname();
   const [pending, setPending] = useState<{ href: string; from: string } | null>(null);
-  const [portraitUnavailable, setPortraitUnavailable] = useState(false);
   const pathnameHref = pathname === "/" || pathname.startsWith("/projects/") ? "/" : pathname;
 
   // The clicked link is highlighted immediately, but only while the router is
@@ -24,7 +23,9 @@ export function Header() {
     <div className="header-main">
       <div className="header-brand">
         <div className="profile-avatar" aria-label="Artist portrait">
-          {portraitUnavailable ? <span aria-hidden="true">D</span> : <Image src={mediaUrl("/portfolio/profile/icon.png")} alt="Daryna Chernysheva" width={160} height={160} sizes="112px" onError={() => setPortraitUnavailable(true)} />}
+          {/* Eager and on every page: it sits at the top of the header, so the
+              lazy-loading heuristics would only ever delay it. */}
+          <MediaImage src={mediaUrl("/portfolio/profile/icon.png")} alt="Daryna Chernysheva" width={583} height={581} sizes="112px" loading="eager" fallback={<span aria-hidden="true">D</span>} />
         </div>
         <div>
           <Link className="portfolio-name" href="/" aria-label="Daryna Chernysheva — portfolio home">

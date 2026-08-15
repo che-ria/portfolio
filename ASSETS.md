@@ -64,22 +64,60 @@ Two independent layers, both already configured:
   `public, max-age=31536000, immutable` on upload.
 - **Optimizer cache.** `images.minimumCacheTTL` is 31 days in `next.config.ts`,
   so a resized variant is generated once and reused.
+- **Paper texture.** The one image not served through the optimizer. It lives in
+  `public/textures/` and `next.config.ts` gives `/textures/*` an immutable
+  year-long `Cache-Control`, so replacing it means giving it a new file name.
 
 Because both layers cache hard, **treat uploaded files as immutable**. To replace
 a piece, upload it under a new name (`cover.v2.png`, or a content hash such as
 `cover.3f14c2.png`) and update the reference in `data/site.ts`. Overwriting a
 file in place leaves stale copies in CDN and browser caches for up to a month.
 
+## After adding or replacing artwork
+
+Run:
+
+```bash
+npm run media:meta
+```
+
+This reads the intrinsic pixel size of every image straight from the bucket —
+only the file header, a ranged request, so the whole catalogue costs a few
+megabytes — and rewrites `data/image-meta.ts`. Commit the result.
+
+That table is what lets the galleries reserve the exact box an image will
+occupy before it arrives, so nothing on the page moves as the artwork loads,
+and what lets the masonry layout know which pieces are wide without downloading
+them first. Skipping the step is not fatal: an image missing from the table
+falls back to a 4:3 placeholder and shifts the layout once it lands.
+
+The script also reports anything it could not read. A `404` there means the file
+is referenced in `data/site.ts` but is not in the bucket — worth fixing, since
+that is a hole in the live gallery.
+
 ## What the app already does
 
 You do not need to pre-resize anything. `next/image` requests a width that
-matches the slot the image occupies and re-encodes to AVIF/WebP on demand:
+matches the slot the image occupies and re-encodes to AVIF/WebP on demand. The
+rungs in `images.deviceSizes` are chosen so each slot lands just above its own
+size rather than being rounded up to the next generic breakpoint:
 
 | Slot | Delivered |
 | --- | --- |
-| Project grid tile, 1x desktop | 640 px AVIF (~40 KB from a 9 MB PNG) |
-| Project grid tile, 2x desktop | 1920 px AVIF |
-| Lightbox (zoomable to 4x) | 3840 px AVIF (~500 KB) |
+| Illustration masonry tile, 1x desktop | 448 px AVIF (~15 KB from a multi-MB PNG) |
+| Project grid tile, 1x desktop | 640 px AVIF |
+| Full-width project row, 1x desktop | 1280 px AVIF |
+| Phone, 2x | 828 px AVIF |
+| Lightbox, landscape piece on a 1440 px laptop | 1536 px AVIF at q88 (~65 KB) |
+| Lightbox, tall portrait on the same laptop | 640 px AVIF at q88 (~23 KB) |
+| Lightbox, zoomed in, or a 2x display | up to 3840 px AVIF |
+
+The lightbox asks for the width the artwork is actually drawn at, not the width
+of the window. A tall portrait only occupies a fraction of a landscape screen,
+so requesting a viewport-wide candidate for it would fetch several times the
+pixels on display — hence the two very different rows above for the same slot.
+Zooming multiplies that width by the zoom step, so the larger candidates are
+only ever fetched by someone who has zoomed in far enough to see them.
 
 Upload the **originals**. Downscaling them before upload only costs quality —
 the optimizer will not upscale, so a small source caps how sharp the lightbox
