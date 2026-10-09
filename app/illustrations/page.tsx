@@ -5,5 +5,5 @@ import { Footer } from "@/components/Footer";
 export const metadata: Metadata = { title: "Illustrations" };
 
 export default function IllustrationsPage() {
-  return <main id="content" className="illustrations-page textured-section"><section className="illustrations-gallery"><ArtworkGallery /></section><Footer /></main>;
+  return <main id="content" className="illustrations-page"><section className="illustrations-gallery"><ArtworkGallery /></section><Footer /></main>;
 }

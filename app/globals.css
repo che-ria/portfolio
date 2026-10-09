@@ -1,644 +1,134 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #120d0f;
-  --ink-soft: #1c1316;
-  --wine: #4c171d;
-  --wine-bright: #8d3037;
-  --rust: #a04b3f;
-  --parchment: #d5c4aa;
-  --parchment-dark: #bba68b;
-  --ivory: #eee6d8;
-  --muted: #b8a99e;
-  --header-h: 72px;
-}
-
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; background: var(--ink); }
-body { margin: 0; overflow-x: hidden; background: var(--ink); color: var(--ivory); font-family: var(--font-body), Georgia, serif; font-size: 18px; }
-a { color: inherit; text-decoration: none; }
-button, input, select, textarea { font: inherit; }
-button, a { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #f0c995; outline-offset: 4px; }
-::selection { background: var(--wine-bright); color: white; }
-
-.skip-link { position: fixed; z-index: 1000; left: 1rem; top: -100px; padding: .7rem 1rem; background: var(--parchment); color: var(--ink); }
-.skip-link:focus { top: 1rem; }
-.textured-section, .terms-main { background-color: var(--ink); background-image: radial-gradient(circle at 15% 30%, rgba(117,47,52,.12) 0 1px, transparent 2px), radial-gradient(circle at 70% 75%, rgba(213,196,170,.055) 0 1px, transparent 2px), repeating-radial-gradient(ellipse at 50% -25%, transparent 0 24px, rgba(255,255,255,.018) 25px 26px); background-size: 29px 31px, 37px 41px, 180px 90px; }
-
-/* Header */
-.site-header { position: sticky; z-index: 100; top: 0; height: var(--header-h); display: flex; align-items: center; background: linear-gradient(90deg, #3d1318, #571b21 45%, #3c1217); box-shadow: 0 9px 30px rgba(0,0,0,.35); }
-.site-header::after { content: ""; position: absolute; left: 0; top: calc(100% - 1px); width: 100%; height: 17px; background: var(--wine); clip-path: polygon(0 0,100% 0,100% 35%,97% 60%,94% 43%,90% 76%,86% 48%,82% 64%,77% 38%,72% 70%,67% 47%,62% 83%,56% 42%,51% 67%,46% 36%,41% 75%,36% 48%,31% 67%,25% 39%,20% 77%,15% 46%,10% 66%,5% 41%,0 74%); pointer-events: none; }
-.site-header { padding-inline: 3rem; }
-.desktop-nav { display: flex; align-items: center; gap: 2.2rem; margin-left: auto; padding: 0; }
-.desktop-nav a { position: relative; padding: 1rem 0 .8rem; font-size: .86rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.desktop-nav a::after { content: ""; position: absolute; bottom: .55rem; left: 50%; width: 0; height: 1px; background: var(--parchment); transform: translateX(-50%); transition: width .2s ease; }
-.desktop-nav a:hover::after, .desktop-nav a.active::after { width: 100%; }
-
-@keyframes heroCycle { 0%, 27% { opacity: 1; transform: scale(1.015); } 33%, 94% { opacity: 0; transform: scale(1.055); } 100% { opacity: 1; transform: scale(1.015); } }
-@keyframes float { 50% { transform: translateY(6px); } }
-.ornate-button { display: inline-flex; align-items: center; justify-content: center; gap: 1rem; border: 3px double var(--wine); background: transparent; color: var(--wine); cursor: pointer; padding: .7rem 1.4rem; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; transition: .2s; }.ornate-button:hover { background: var(--wine); color: var(--ivory); }
-
-/* Footer */
-.site-footer { position: relative; display: flex; min-height: 86px; align-items: center; gap: 2rem; padding: 1.5rem 3rem; background: #421419; color: #c6b6ad; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }.site-footer p { margin: 0; }.site-footer nav { display: flex; gap: 1.5rem; margin-left: auto; }.site-footer a:hover { color: white; }
-.projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; max-width: 1120px; margin: auto; padding: 2rem 1.5rem 7rem; }
-.project-card { position: relative; min-width: 0; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(213,196,170,.42); background: #1b1113; box-shadow: 0 18px 45px rgba(0,0,0,.22); }
-.project-card img { object-fit: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1), filter .4s; }
-.project-card-shade { position: absolute; inset: 0; background: linear-gradient(rgba(8,4,5,.2), rgba(8,4,5,.5)), radial-gradient(circle at center, transparent, rgba(8,4,5,.3)); transition: background .35s; }
-.project-card-title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; font-family: var(--font-display); font-size: clamp(2.2rem, 4vw, 3.8rem); line-height: .9; text-align: center; text-shadow: 0 3px 22px #000; }
-.project-card-title small { margin-bottom: .75rem; color: #dfb596; font-family: var(--font-body); font-size: .65rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-.project-card:hover img, .project-card:focus-visible img { transform: scale(1.055); filter: saturate(.85) brightness(.78); }
-.project-card:hover .project-card-shade, .project-card:focus-visible .project-card-shade { background: linear-gradient(rgba(8,4,5,.08), rgba(8,4,5,.35)); }
-.project-card::after { content: "View project →"; position: absolute; right: 1rem; bottom: .8rem; color: #eadaca; font-size: .62rem; font-weight: 700; letter-spacing: .14em; opacity: 0; text-transform: uppercase; transform: translateX(-8px); transition: .3s; }
-.project-card:hover::after, .project-card:focus-visible::after { opacity: 1; transform: none; }
-.illustrations-gallery { padding: 1rem max(4vw, 1rem) 8rem; }
-
-/* Project detail */
-.project-page { min-height: 100vh; }
-.project-switcher { display: grid; grid-template-columns: minmax(90px, 1fr) minmax(0, 760px) minmax(90px, 1fr); align-items: center; gap: 2rem; max-width: 1280px; margin: auto; padding: 4rem 2rem 2rem; text-align: center; }
-.project-switcher > a { display: flex; align-items: center; justify-content: center; gap: .65rem; color: #d69576; font-size: 1.55rem; transition: color .2s, transform .2s; }
-.project-switcher > a:first-child:hover { color: white; transform: translateX(-5px); }.project-switcher > a:last-child:hover { color: white; transform: translateX(5px); }
-.project-switcher > a small { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.project-switcher p { margin: 0 0 .4rem; color: #c57662; font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-.project-switcher h1 { margin: 0; font-family: var(--font-display); font-size: clamp(3.2rem, 7vw, 6.3rem); font-weight: 400; letter-spacing: -.035em; line-height: .84; }
-.project-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; width: min(1220px, calc(100% - 3rem)); margin: auto; }
-.project-shot { display: flex; min-width: 0; flex-direction: column; border: 0; background: transparent; color: inherit; cursor: zoom-in; padding: 0; text-align: left; }
-.project-shot-hero { grid-column: 1 / -1; }
-.project-shot-image { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: #211518; }
-.project-shot-hero .project-shot-image { aspect-ratio: 16 / 8.5; }
-.project-shot img { object-fit: cover; transition: transform .45s ease, filter .35s; }
-.project-shot:hover img, .project-shot:focus-visible img { transform: scale(1.035); filter: brightness(.82); }
-.project-shot-caption { padding: .55rem .2rem 1.1rem; color: #bbaea6; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
-.project-back { padding: 5rem 1.5rem 7rem; text-align: center; }
-.project-back .ornate-button { border-color: var(--parchment-dark); color: var(--parchment); }
-.project-back .ornate-button:hover { background: var(--parchment); color: var(--wine); }
-.contact-portrait { position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
-.contact-portrait img { object-fit: cover; }
-.contact-copy h1 { margin: .1rem 0 .8rem; font-family: var(--font-display); font-size: clamp(5rem, 9vw, 8rem); font-weight: 400; line-height: .8; }
-
-@media (max-width: 900px) {.contact-portrait { width: min(450px, 84%); margin: auto; }
-}
-
-@media (max-width: 700px) {
-  :root { --header-h: 66px; }
-  body { font-size: 17px; }
-  .desktop-nav { display: none; }.site-header { justify-content: center; }
-  .site-header { padding-inline: 0; }
-  .site-footer { flex-wrap: wrap; justify-content: center; padding: 1.4rem; text-align: center; }.site-footer nav { width: 100%; justify-content: center; margin-left: 0; }.projects-grid { grid-template-columns: 1fr; gap: .75rem; padding: 1.5rem .8rem 5rem; }.project-card { aspect-ratio: 4 / 3; }.project-card-title { font-size: 2.6rem; }.project-card::after { display: none; }
-  .project-switcher { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: .4rem; padding: 3.5rem .7rem 1.5rem; }.project-switcher > a small { display: none; }.project-switcher h1 { font-size: clamp(2.7rem, 13vw, 4.2rem); }.project-gallery { grid-template-columns: 1fr; gap: .4rem; width: calc(100% - 1rem); }.project-shot-hero { grid-column: auto; }.project-shot-hero .project-shot-image, .project-shot-image { aspect-ratio: 4 / 3; }.project-shot-caption { padding-inline: .35rem; }
-  .illustrations-gallery { padding: 0 1rem 6rem; }.contact-portrait { width: 80%; }.contact-copy { text-align: center; }.contact-copy h1 { font-size: 5rem; }
-}
-
-/* Editorial paper portfolio */
-:root {
-  --paper: #f4f1e8;
-  --paper-deep: #e8e2d4;
-  --black: #15151a;
-  --accent: #bc9674;
-}
-
-html, body { background-color: var(--paper); }
-body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero {
-  background-color: var(--paper);
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(20,20,24,.075) 0 .55px, transparent .8px),
-    radial-gradient(circle at 72% 64%, rgba(20,20,24,.045) 0 .5px, transparent .75px),
-    repeating-linear-gradient(97deg, rgba(255,255,255,.12) 0 1px, transparent 1px 4px);
-  background-size: 4px 4px, 7px 7px, auto;
-  color: var(--black);
-}
-@keyframes marquee-scroll { to { transform: translateX(-25%); } }
-.portfolio-name { position: absolute; z-index: 1; inset: 0; display: block; max-width: none; color: var(--black); font-size: clamp(4.8rem, 9vw, 9rem); letter-spacing: -.045em; line-height: .78; text-transform: lowercase; }
-.portfolio-name span { position: absolute; white-space: nowrap; }.portfolio-name span:first-child { top: 33%; left: max(3vw, calc((100% - 1360px) / 2)); }.portfolio-name span:last-child { right: max(3vw, calc((100% - 1360px) / 2)); bottom: 19%; font-style: italic; font-weight: 700; }
-
-.desktop-nav { min-height: 70px; gap: clamp(2.5rem, 6vw, 6.5rem); border: 0; border-top: 1px solid #000; border-bottom: 1px solid #000; background: var(--black); }
-.desktop-nav a { color: white; font-size: 1rem; }.desktop-nav a::after { display: none; }.desktop-nav a:hover, .desktop-nav a.active { color: var(--accent); }
-.projects-grid { gap: 1.25rem; padding-top: 1.25rem; }
-.project-card { border: 2px solid var(--black); border-radius: 0; background: #d6d2c8; box-shadow: 5px 5px 0 var(--black); }
-.project-card img { filter: grayscale(1) contrast(1.05); }
-.project-card:hover img, .project-card:focus-visible img { filter: grayscale(0) contrast(1); }
-.project-card-shade { background: linear-gradient(rgba(0,0,0,.04), rgba(0,0,0,.36)); }
-.project-card-title { color: white; letter-spacing: -.02em; text-shadow: 0 2px 10px black; text-transform: lowercase; }
-.project-card-title small { padding: .25rem .45rem; background: var(--black); color: white; }
-.project-card::after { right: 0; bottom: 0; background: var(--black); padding: .45rem .6rem; }
-
-.project-switcher { border-bottom: 2px solid var(--black); }
-.project-switcher h1 { color: var(--black); letter-spacing: -.035em; text-transform: lowercase; }.project-switcher p { color: #78614e; }.project-switcher > a { color: var(--black); }
-.project-shot-image { border: 1px solid var(--black); border-radius: 0; background: #d6d2c8; }.project-shot img { filter: grayscale(1); }.project-shot:hover img, .project-shot:focus-visible img { filter: grayscale(0); }
-.project-shot-caption { color: var(--black); }
-
-.contact-portrait { border: 2px solid var(--black); border-radius: 0; box-shadow: 7px 7px 0 var(--black); }.contact-portrait img { filter: grayscale(1) contrast(1.15); }
-.contact-copy h1 { color: var(--black); letter-spacing: -.04em; text-transform: lowercase; }
-.contact-form .ornate-button, .project-back .ornate-button { border: 1px solid var(--black); background: var(--black); color: white; }.contact-form .ornate-button:hover, .project-back .ornate-button:hover { background: var(--accent); color: var(--black); }
-
-.site-footer { border-top: 1px solid #000; background: var(--black); }
-
-@media (max-width: 700px) {
-  .portfolio-name { display: block; font-size: clamp(3rem, 15vw, 4.2rem); line-height: .8; }
-  .portfolio-name span { display: block; font-size: 1em; }.portfolio-name span:first-child { top: 28%; left: 1rem; }.portfolio-name span:last-child { right: 1rem; bottom: 16%; font-size: .78em; }
-  .desktop-nav { min-height: 62px; gap: 1.35rem; }.desktop-nav a { font-size: .76rem; }
-  .projects-grid { gap: 1.1rem; width: calc(100% - 1.5rem); padding-top: 1.1rem; }.project-card { box-shadow: 4px 4px 0 var(--black); }
-}
-
-/* Project card polish */
-.project-card { border-radius: 20px; box-shadow: 0 12px 32px rgba(18,18,22,.14); }
-.project-card::after { display: none; content: none; }
-
-@media (max-width: 700px) {
-  .project-card { border-radius: 14px; box-shadow: 0 8px 22px rgba(18,18,22,.13); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-}
-
-/* Clean portfolio direction */
-:root {
-  --ink: #18383c;
-  --ink-soft: #294b50;
-  --wine: #a75b56;
-  --wine-bright: #b96861;
-  --rust: #a75b56;
-  --parchment: #f1f4f5;
-  --parchment-dark: #d8dfe1;
-  --ivory: #f8f9fa;
-  --muted: #708084;
-  --header-h: 0px;
+  --portfolio-blue: #3e3ed6;
+  --portfolio-ink: #030303;
   --font-body: "SN Pro", Arial, sans-serif;
 }
 
-html { background: #f1f4f5; }
-body { background: #f1f4f5; color: #18383c; font-family: var(--font-body); font-size: 16px; font-weight: 600; }
-h1, h2, h3, .project-card-title { font-family: var(--font-display), Arial, sans-serif; font-weight: 700; }
-.textured-section, .terms-main { background: #f1f4f5; background-image: none; }
+/* --- Base --------------------------------------------------------------- */
+* { box-sizing: border-box; }
 
-.site-header { position: relative; z-index: 100; display: block; height: auto; padding: 0; background: transparent; box-shadow: none; }
-.site-header::after { display: none; }
-.portfolio-name { color: #fafafa; font-size: clamp(2.7rem, 5.4vw, 5.4rem); letter-spacing: .015em; line-height: 1; text-transform: uppercase; }
-.portfolio-name span { white-space: nowrap; }
-.header-tagline { color: #e7e7ea; font-size: clamp(1rem, 1.7vw, 1.55rem); font-weight: 200; letter-spacing: .025em; }
-.header-tagline:hover { color: white; }
-.desktop-nav { display: flex; min-height: 78px; align-items: center; justify-content: center; gap: clamp(2rem, 5vw, 5.8rem); margin: 0; border-bottom: 1px solid #dce1e2; background: #f5f7f8; padding: .8rem 1.5rem; }
-.desktop-nav a { color: #173c41; padding: .65rem 0; font-family: var(--font-body); font-size: clamp(.88rem, 1.25vw, 1.18rem); font-weight: 600; letter-spacing: .035em; text-transform: uppercase; transition: color .2s; }
-.desktop-nav a::after { bottom: .25rem; height: 2px; background: currentColor; }
-.desktop-nav a:hover, .desktop-nav a.active { color: #a65b56; }
+/* Always reserve the scrollbar track, so the layout never shifts sideways when
+   moving between a page tall enough to scroll and one that is not.
 
-.projects-page { min-height: 100vh; background: #f1f4f5; }
-.projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; width: min(1400px, calc(100% - 3rem)); max-width: none; margin: auto; padding: 4.5rem 0 6rem; background: transparent; }
-.project-card { aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #d8dfe1; box-shadow: 0 8px 30px rgba(23, 48, 53, .08); }
-.project-card-shade { background: linear-gradient(rgba(11, 26, 29, .08), rgba(11, 26, 29, .35)); }
-.project-card-title { color: white; font-size: clamp(2rem, 3.5vw, 3.6rem); letter-spacing: .01em; line-height: .95; text-shadow: 0 2px 18px rgba(0,0,0,.45); text-transform: uppercase; }
-.project-card-title small { color: rgba(255,255,255,.82); font-family: var(--font-body); font-size: .62rem; font-weight: 600; letter-spacing: .15em; }
-.project-card::after { color: white; font-family: var(--font-body); }
+   `scrollbar-gutter: stable` is the modern spelling but does nothing here:
+   it only applies to scroll containers, and in standards mode <html> with
+   `overflow: visible` is not one — it merely propagates its overflow to the
+   viewport. (It appears to work in quirks mode, which is a trap when testing.)
+   Verified in Chrome 151: gutter reserved 0px with `stable`, 15px with this.
 
-.project-page { background: #f1f4f5; color: #18383c; }
-.project-switcher { padding-top: 4.5rem; }
-.project-switcher h1 { color: #17383d; font-size: clamp(3rem, 6.8vw, 6rem); letter-spacing: .01em; line-height: .9; text-transform: uppercase; }
-.project-switcher p { color: #a65b56; }
-.project-switcher > a { color: #5b777b; }
-.project-switcher > a:hover { color: #a65b56; }
-.project-gallery { gap: 1rem; }
-.project-shot-image { border-radius: 10px; background: #dbe1e2; }
-.project-shot-caption { color: #64777a; font-family: var(--font-body); }
-.project-back .ornate-button { border: 1px solid #18383c; color: #18383c; }
-.project-back .ornate-button:hover { background: #18383c; color: white; }
-.contact-portrait { border: 0; border-radius: 12px; outline: 0; box-shadow: none; }
-.contact-copy h1 { color: #18383c; text-transform: uppercase; }
+   Owning both axes here also keeps <html> the single scroll container, instead
+   of the viewport taking its overflow from body. ProjectGallery's scroll lock
+   depends on that — see the comment there. */
+html { overflow-x: hidden; overflow-y: scroll; scroll-behavior: smooth; }
 
-.site-footer { min-height: 90px; background: #191920; color: #d9ddde; font-family: var(--font-body); }
-.site-footer a:hover { color: white; }
-
-@media (max-width: 700px) {
-  body { font-size: 15px; }
-  .portfolio-name { display: flex; max-width: 360px; flex-direction: column; font-size: clamp(2.15rem, 11vw, 3.2rem); line-height: .98; }
-  .portfolio-name span { font-size: .74em; }
-  .header-tagline { font-size: 1rem; }
-  .desktop-nav { min-height: 64px; gap: 1.2rem; padding: .5rem .7rem; }
-  .desktop-nav a { font-size: .75rem; letter-spacing: .015em; }
-  .projects-grid { grid-template-columns: 1fr; gap: .8rem; width: calc(100% - 1rem); padding: 2rem 0 4rem; }
-  .project-card { aspect-ratio: 4 / 3; border-radius: 9px; }
-  .project-card-title { font-size: clamp(2rem, 10vw, 3rem); }
-  .project-switcher { padding-top: 3rem; }
-  .project-switcher h1 { font-size: clamp(2.35rem, 11vw, 3.6rem); }
-  .project-shot-image { border-radius: 7px; }
-  .contact-copy h1 { font-size: 4rem; }
-}
-
-/* Final editorial layer */
-html, body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero {
-  background-color: var(--paper);
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(20,20,24,.075) 0 .55px, transparent .8px),
-    radial-gradient(circle at 72% 64%, rgba(20,20,24,.045) 0 .5px, transparent .75px),
-    repeating-linear-gradient(97deg, rgba(255,255,255,.12) 0 1px, transparent 1px 4px);
-  background-size: 4px 4px, 7px 7px, auto;
-  color: var(--black);
-}
-.portfolio-name { color: white; }
-.desktop-nav { min-height: 68px; border-top: 1px solid rgba(255,255,255,.18); border-bottom: 1px solid #000; background: var(--black); }
-.desktop-nav a { color: white; }.desktop-nav a:hover, .desktop-nav a.active { color: var(--accent); }
-.projects-grid { background: transparent; }
-.project-card { border: 2px solid var(--black); border-radius: 0; box-shadow: 5px 5px 0 var(--black); }
-.project-shot-image, .art-card, .contact-portrait { border-radius: 0; }
-
-@media (max-width: 700px) {
-  .portfolio-name { z-index: 3; }
-  .portfolio-name span:first-child { top: 25%; }
-  .portfolio-name span:last-child { top: 62%; right: auto; bottom: auto; left: 1rem; font-size: .48em; }
-  .desktop-nav { min-height: 60px; }
-  .project-card { border-radius: 0; box-shadow: 4px 4px 0 var(--black); }
-}
-@keyframes marquee-scroll { to { transform: translateX(-50%); } }
-.portfolio-name { position: static; inset: auto; display: flex; max-width: none; align-items: center; justify-content: center; gap: .28em; color: white; font-size: clamp(3.1rem, 6vw, 6.2rem); letter-spacing: -.025em; line-height: .9; text-transform: uppercase; }
-.portfolio-name span, .portfolio-name span:first-child, .portfolio-name span:last-child { position: static; inset: auto; display: inline; font-size: 1em; font-style: normal; white-space: nowrap; }
-.project-card img { filter: none; }
-.project-card:hover img, .project-card:focus-visible img { filter: brightness(.68) saturate(.9); transform: scale(1.045); }
-.project-card:hover .project-card-shade, .project-card:focus-visible .project-card-shade { background: linear-gradient(rgba(0,0,0,.08), rgba(0,0,0,.48)); }
-.project-switcher { padding-bottom: 3.5rem; }
-
-@media (max-width: 700px) {
-  .portfolio-name { flex-direction: column; gap: .06em; font-size: clamp(2.35rem, 11vw, 3.2rem); line-height: .88; }
-  .portfolio-name span, .portfolio-name span:first-child, .portfolio-name span:last-child { position: static; inset: auto; font-size: 1em; }
-  .project-switcher { padding-bottom: 2.5rem; }
-}
-
-/* Rounded project covers — keep this final in the cascade */
-.projects-grid .project-card {
-  overflow: hidden;
-  border: 0;
-  border-radius: 16px;
-  box-shadow: none;
-  clip-path: inset(0 round 16px);
-}
-.projects-grid .project-card::after { display: none; content: none; }
-/* The box is a fixed share of the card wide and centred; its height comes from
-   the logo's own shape (`logoBoxHeight` in `data/site.ts`), because `contain`
-   sizes a square mark by the box height and a wide one by the box width. */
-.project-card-logo { position: absolute; z-index: 2; top: 50%; right: 19.4%; left: 19.4%; display: block; height: 64%; transform: translateY(-50%); pointer-events: none; }
-.project-card-logo img { object-fit: contain; filter: none; transform: none; transition: transform .35s ease, filter .35s ease; }
-.project-card:hover .project-card-logo img, .project-card:focus-visible .project-card-logo img { filter: none; transform: scale(1.035); }
-.project-shot-caption:empty { display: none; }
-
-@media (max-width: 700px) {
-  .projects-grid .project-card {
-    border-radius: 12px;
-    clip-path: inset(0 round 12px);
-  }
-}
-
-/* Portfolio artwork should retain its original color */
-.project-gallery .project-shot img { filter: none; }
-.project-gallery .project-shot:hover img, .project-gallery .project-shot:focus-visible img { filter: brightness(.92); }
-.project-switcher { border-bottom: 0; }
-
-/* Project gallery layout by image ratio */
-.project-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.project-gallery .project-shot-image,
-.project-gallery .project-shot-hero .project-shot-image,
-.project-gallery .project-shot.landscape .project-shot-image { aspect-ratio: 16 / 9; overflow: hidden; border: 0; border-radius: 12px; }
-
-@media (max-width: 700px) {
-  .project-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; width: calc(100% - 1rem); }
-  .project-gallery .project-shot-image { border-radius: 8px; }
-}
-
-
-.projects-grid { padding-top: 3rem; }
-.illustrations-page .illustrations-gallery { padding-top: 3rem; }
-
-.project-switcher > a:hover,
-.project-switcher > a:focus-visible { color: #18383c; }
-.project-switcher > a:first-child:hover,
-.project-switcher > a:last-child:hover,
-.project-switcher > a:first-child:focus-visible,
-.project-switcher > a:last-child:focus-visible { color: #18383c; }
-
-.project-back .ornate-button,
-.contact-form .ornate-button {
-  border-color: #18383c;
-  background: transparent;
-  color: #18383c;
-}
-.project-back .ornate-button:hover,
-.project-back .ornate-button:focus-visible,
-.contact-form .ornate-button:hover,
-.contact-form .ornate-button:focus-visible {
-  background: #18383c;
-  color: white;
-}
-
-.back-to-top {
-  position: fixed;
-  z-index: 120;
-  right: 1.35rem;
-  bottom: 1.35rem;
-  display: grid;
-  width: 46px;
-  height: 46px;
-  padding: 0;
-  border: 1px solid #18383c;
-  border-radius: 50%;
-  background: rgba(241, 244, 245, .94);
-  color: #18383c;
-  cursor: pointer;
-  place-items: center;
-  box-shadow: 0 4px 16px rgba(23, 56, 61, .15);
-}
-.back-to-top svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
-.back-to-top:hover, .back-to-top:focus-visible { background: #18383c; color: white; }
-
-/* Icons use one library and center from the button box, never from font baselines. */
-.project-switcher > a > svg { width: 1.15rem; height: 1.15rem; flex: 0 0 auto; }
-.ornate-button > svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
-
-@media (max-width: 700px) {
-  .projects-grid, .illustrations-page .illustrations-gallery { padding-top: 1.5rem; }
-  .back-to-top { right: .8rem; bottom: .8rem; width: 42px; height: 42px; }
-}
-
-/* Header rethink + interaction baseline */
-.site-header {
-  position: relative;
-  z-index: 100;
-  display: block;
-  height: auto;
-  padding: 0;
-  background: var(--black, #191920);
-  box-shadow: none;
-}
-.site-header::after { display: none; }
-.header-main {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-  justify-items: center;
-  gap: 1.75rem;
-  width: min(1440px, 100%);
-  min-height: 220px;
-  margin: auto;
-  padding: 3.35rem clamp(1rem, 4vw, 4rem) 1.8rem;
-}
-.header-brand { display: grid; justify-items: center; gap: .3rem; }
-.portfolio-name {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: .24em;
-  width: fit-content;
-  color: white;
-  font-size: clamp(2.15rem, 3.8vw, 4rem);
-  letter-spacing: -.035em;
-  line-height: .77;
-  text-transform: uppercase;
-}
-.portfolio-name span:last-child { padding-left: 0; }
-.header-tagline {
-  margin: 0;
-  color: rgba(255, 255, 255, .7);
-  font-size: clamp(.78rem, 1.15vw, 1rem);
-  font-weight: 200;
-  letter-spacing: .045em;
-  text-align: center;
-}
-.desktop-nav {
-  display: flex;
-  min-height: auto;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 3vw, 3.25rem);
-  margin: 0;
-  border: 0;
-  background: transparent;
-  padding: 0;
-}
-.desktop-nav a {
-  position: relative;
-  padding: .6rem 0;
-  color: white;
-  font-size: clamp(.72rem, 1vw, .9rem);
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  transition: color .18s ease;
-}
-.desktop-nav a::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: .25rem;
-  left: 0;
-  width: auto;
-  height: 2px;
-  background: var(--accent, #b96861);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform .18s ease;
-}
-.desktop-nav a.active { color: var(--accent, #b96861); }
-.desktop-nav a.active::after { transform: scaleX(1); }
-.desktop-nav a:active {
-  background: white;
-  color: var(--black, #191920);
-  outline: 1px solid white;
-  outline-offset: 5px;
-}
-.desktop-nav a:active::after { background: var(--black, #191920); transform: scaleX(1); }
-
-/* Every icon is optically centered with its adjacent text, rather than its font baseline. */
-button > svg, a > svg, .ornament b > svg, .contact-success > span > svg { display: block; flex: 0 0 auto; }
-.ornate-button, .project-switcher > a, .back-to-top { align-items: center; justify-content: center; }
-a[href], button:not(:disabled), [role="button"] { cursor: pointer; }
-button:disabled { cursor: not-allowed; }
-
-@media (hover: hover) {
-  .desktop-nav a:hover { color: var(--accent, #b96861); }
-  .desktop-nav a:hover::after { transform: scaleX(1); transform-origin: left; }
-}
-
-@media (max-width: 700px) {
-  .header-main { grid-template-columns: 1fr; gap: 1.4rem; min-height: 0; padding: 2.5rem 1rem 1.45rem; }
-  .portfolio-name { margin: auto; font-size: clamp(2.1rem, 9.6vw, 3.2rem); text-align: center; }
-  .desktop-nav { justify-content: center; gap: clamp(.85rem, 7vw, 2rem); padding-bottom: .1rem; }
-  .desktop-nav a { font-size: .68rem; letter-spacing: .045em; }
-}
-
-/* Blue-and-white portfolio header */
-:root { --portfolio-blue: #3e3ed6; --portfolio-ink: #030303; }
-html, body, .projects-page { background-color: #fff; }
-body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero {
-  color: var(--portfolio-ink); background-color: #fff;
-  background-image: radial-gradient(circle at 18% 22%, rgba(3,3,3,.035) 0 .45px, transparent .8px), radial-gradient(circle at 74% 66%, rgba(62,62,214,.022) 0 .5px, transparent .9px), repeating-linear-gradient(105deg, rgba(3,3,3,.012) 0 1px, transparent 1px 5px);
-  background-size: 5px 5px, 8px 8px, auto;
-}
-.site-header { position: relative; z-index: 100; display: block; height: auto; padding: 0; background: transparent; box-shadow: none; }
-.welcome-strip { margin: 0; padding: .5rem 1rem .55rem; background: var(--portfolio-blue); color: #fff; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.75rem, 1.15vw, 1rem); font-weight: 300; letter-spacing: .015em; line-height: 1; text-align: center; }
-.welcome-strip span { margin: 0 .3em; }
-.header-main { display: flex; width: min(100%, 980px); min-height: 0; flex-direction: column; align-items: center; gap: 2.4rem; margin: 0 auto; padding: clamp(2.6rem, 5vw, 4.5rem) 1.25rem 2.1rem; }
-.header-brand { display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 2.4vw, 1.7rem); }
-.profile-avatar { display: grid; width: clamp(76px, 8vw, 112px); aspect-ratio: 1; flex: 0 0 auto; overflow: hidden; border: 2px solid var(--portfolio-ink); border-radius: 50%; background: #f4f4ff; place-items: center; }
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.profile-avatar span { color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: 2.4rem; }
-.portfolio-name { display: flex; gap: .18em; color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: clamp(2.35rem, 5.5vw, 5rem); font-weight: 400; font-synthesis: none; letter-spacing: .025em; line-height: .9; text-transform: uppercase; }
-.portfolio-name span, .portfolio-name span:first-child, .portfolio-name span:last-child { position: static; inset: auto; display: inline; padding: 0; font-size: 1em; font-style: normal; white-space: nowrap; }
-.header-tagline { margin: .55rem 0 0; color: var(--portfolio-ink); font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.85rem, 1.5vw, 1.2rem); font-weight: 400; letter-spacing: .02em; }
-.desktop-nav { display: flex; min-height: 0; align-items: center; justify-content: center; gap: clamp(1.2rem, 4.6vw, 4.2rem); margin: 0; padding: 0; border: 0; background: transparent; }
-.desktop-nav a { padding: .2rem 0; color: var(--portfolio-ink); font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.95rem, 1.55vw, 1.25rem); font-weight: 300; letter-spacing: .01em; line-height: 1.1; text-transform: none; }
-.desktop-nav a::after { display: none; }
-.desktop-nav a:hover, .desktop-nav a.active { color: var(--portfolio-blue); }
-@media (max-width: 700px) { .header-main { gap: 1.7rem; padding: 2rem 1rem 1.65rem; } .header-brand { gap: .85rem; } .profile-avatar { width: 68px; } .portfolio-name { flex-direction: column; gap: .04em; font-size: clamp(2rem, 10vw, 3rem); line-height: .8; } .header-tagline { margin-top: .5rem; font-size: .85rem; } .desktop-nav { width: 100%; flex-wrap: wrap; gap: .65rem 1.35rem; } .desktop-nav a { font-size: .92rem; } }
-
-/* Soft, white kraft paper */
-html, body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero, .contact-page {
-  background-color: #fefefd;
-  background-image:
-    radial-gradient(ellipse at 12% 18%, rgba(191, 182, 164, .14) 0, rgba(191, 182, 164, 0) 34%),
-    radial-gradient(ellipse at 87% 73%, rgba(202, 193, 177, .13) 0, rgba(202, 193, 177, 0) 37%),
-    repeating-linear-gradient(116deg, rgba(110, 98, 79, .022) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(22deg, rgba(255, 255, 255, .7) 0 1px, transparent 1px 9px),
-    radial-gradient(circle at 31% 69%, rgba(99, 87, 70, .055) 0 .45px, transparent .8px),
-    radial-gradient(circle at 71% 27%, rgba(99, 87, 70, .045) 0 .5px, transparent .9px);
-  background-size: auto, auto, auto, auto, 5px 5px, 8px 8px;
-}
-
-.portfolio-name { font-size: clamp(2rem, 4.6vw, 4.15rem); }
-.header-tagline { color: var(--portfolio-ink); text-align: left; text-decoration: none; }
-.header-tagline:hover { color: var(--portfolio-ink); text-decoration: none; }
-
-.contact-page { min-height: 100vh; }
-.contact-card {
-  display: grid;
-  grid-template-columns: minmax(230px, 520px) minmax(0, 520px);
-  align-items: center;
-  justify-content: center;
-  gap: clamp(2.3rem, 7vw, 6.5rem);
-  min-height: min(680px, calc(100vh - 38px));
-  padding: clamp(3.5rem, 8vw, 7rem) 1.5rem;
-}
-.contact-card .contact-portrait {
-  position: static;
-  width: 100%;
-  aspect-ratio: auto;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-.contact-card .contact-portrait img { display: block; width: 100%; height: auto; object-fit: contain; filter: none; }
-.contact-card .contact-copy { color: var(--portfolio-ink); }
-.contact-card .contact-copy h1 { margin: 0; color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: clamp(3.6rem, 7vw, 6rem); font-weight: 400; letter-spacing: .02em; line-height: .85; text-transform: uppercase; }
-.contact-description { max-width: 490px; margin: 1.55rem 0 2rem; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1rem, 1.35vw, 1.15rem); font-weight: 300; line-height: 1.45; }
-.contact-description p { margin: 0; }
-.contact-description p + p { margin-top: 1rem; }
-.contact-description .contact-closing { color: var(--portfolio-blue); font-weight: 400; }
-.contact-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; font-family: var(--font-sour-gummy), sans-serif; }
-.cv-button { display: inline-flex; align-items: center; justify-content: center; min-width: 146px; padding: .8rem 1.7rem; border-radius: 999px; background: var(--portfolio-blue); color: #fff; font-size: 1.12rem; font-weight: 400; transition: transform .18s ease, background .18s ease; }
-.cv-button:hover, .cv-button:focus-visible { background: #2d2db7; color: #fff; transform: translateY(-2px); }
-.contact-links { display: flex; flex-wrap: wrap; gap: 1rem 1.6rem; }
-.contact-social-link { display: inline-flex; align-items: center; gap: .65rem; color: var(--portfolio-ink); font-size: 1rem; font-weight: 400; transition: color .18s ease, transform .2s ease; }
-.contact-social-link > span:last-child { border-bottom: 1px solid currentColor; }
-.contact-social-icon { display: grid; width: 2.15rem; height: 2.15rem; border-radius: 50%; background: var(--portfolio-blue); color: #fff; place-items: center; }
-.contact-social-icon svg { width: 1.15rem; height: 1.15rem; }
-.contact-social-link:hover, .contact-social-link:focus-visible { color: var(--portfolio-blue); transform: translateY(-3px); }
-@media (max-width: 700px) {
-  .portfolio-name { font-size: clamp(1.85rem, 9vw, 2.75rem); }
-  .contact-card { grid-template-columns: minmax(0, 440px); gap: 2rem; min-height: 0; padding: 3.5rem 1.4rem 5rem; text-align: center; }
-  .contact-card .contact-portrait { width: min(68vw, 280px); margin: auto; }
-  .contact-description { margin: 1.25rem auto 1.8rem; }
-  .contact-actions { align-items: center; }
-  .contact-links { justify-content: center; }
-}
-
-/* Header and footer spacing polish */
-.profile-avatar { overflow: visible; border: 0; border-radius: 0; background: transparent; }
-.header-tagline { margin-top: .25rem; }
-.header-main { gap: 2.15rem; padding-top: clamp(1.8rem, 3vw, 2.4rem); }
-.site-footer {
-  display: flex;
-  min-height: 126px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.15rem;
-  padding: 1.6rem;
-  border: 0;
-  background: var(--portfolio-blue);
-  color: #fff;
-  font-family: var(--font-sour-gummy), sans-serif;
-  text-transform: none;
-}
-.site-footer nav { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .6rem clamp(1.1rem, 3.8vw, 3.25rem); margin: 0; }
-.site-footer nav a { color: #fff; font-size: clamp(.92rem, 1.35vw, 1.1rem); font-weight: 300; letter-spacing: .01em; }
-.site-footer nav a:hover, .site-footer nav a:focus-visible { color: #fff; text-decoration: underline; }
-.site-footer p { margin: 0; color: rgba(255, 255, 255, .75); font-size: .72rem; font-weight: 300; letter-spacing: .04em; }
-@media (max-width: 700px) { .header-main { gap: 1.7rem; padding-top: 1.7rem; } .header-tagline { margin-top: .2rem; } .site-footer { min-height: 142px; } .site-footer nav { gap: .55rem 1.2rem; } }
-
-/* Project page title and navigation */
-html, body, .projects-page, .project-page, .textured-section, .terms-main, .contact-hero, .contact-page {
-  background-color: #fbfbfa;
-  background-image: url("https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev/textures/white-crumpled-paper.webp");
-  background-position: center;
-  background-size: 1024px 1024px;
-}
-.project-switcher {
-  display: flex;
-  width: min(1220px, calc(100% - 3rem));
-  max-width: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  margin: auto;
-  padding: 3.4rem 0 2rem;
-  text-align: left;
-}
-.project-switcher h1 {
-  margin: 0;
-  color: var(--portfolio-blue);
-  font-family: var(--font-barrio), cursive;
-  font-size: clamp(3rem, 5.6vw, 5.2rem);
-  font-weight: 400;
-  letter-spacing: .02em;
-  line-height: .88;
-  text-transform: uppercase;
-}
-@media (max-width: 700px) {
-  .project-switcher { width: calc(100% - 2rem); flex-direction: column; align-items: flex-start; gap: 1.15rem; padding: 2.6rem 0 1.5rem; }
-  .project-switcher h1 { font-size: clamp(2.6rem, 12vw, 4rem); }
-}
-
-/* One continuous paper surface across every page */
+/* One continuous paper surface across every page. The texture is served from
+   `public/` rather than the bucket: it is the one image every page paints before
+   anything else, and going to the CDN for it meant a second DNS lookup, TLS
+   handshake and connection before the first pixel of background — on a
+   rate-limited `r2.dev` host at that. */
 html, body {
   background-color: #fbfbfa;
-  background-image: url("https://pub-9f988e3ef4e845fdb2e4f9c57ab4b44b.r2.dev/textures/white-crumpled-paper.webp");
+  background-image: url("/textures/white-crumpled-paper.webp");
   background-position: center top;
   background-size: 1024px 1024px;
   background-attachment: fixed;
 }
-.projects-page, .project-page, .textured-section, .terms-main, .contact-hero, .contact-page, .contact-form-section { background: transparent; }
 
-/* Air around the identity block */
-.header-main { gap: 2.45rem; padding-top: clamp(2.35rem, 4vw, 3.2rem); padding-bottom: clamp(2.45rem, 4vw, 3.25rem); }
-
-/* Centered project title with navigation anchored to each side */
-.project-switcher {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
-  align-items: center;
-  gap: 1rem;
-  text-align: center;
-}
-.project-switcher > a {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
+/* Sticky footer.
+   The footer lives inside <main>, and the page shells carried `min-height: 100vh`.
+   Because <main> starts below the header, that made the document taller than the
+   viewport by exactly the header's height — the surplus landing as a blank strip
+   after the footer on any page whose content is shorter than the screen (Contact).
+   Making the body a column lets the shell fill the *remaining* height instead. */
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin: 0;
   color: var(--portfolio-ink);
-  font-family: var(--font-sour-gummy), sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
-  font-weight: 400;
-  line-height: 1;
-  transition: color .18s ease, transform .18s ease;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
 }
+.projects-page, .project-page, .contact-page, .illustrations-page { flex: 1 0 auto; min-height: 0; }
+
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a[href], button:not(:disabled), [role="button"] { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #f0c995; outline-offset: 4px; }
+::selection { background: #b96861; color: white; }
+
+/* Icons center against the adjacent text from the box, never from a font baseline. */
+button > svg, a > svg { display: block; flex: 0 0 auto; }
+
+.skip-link { position: fixed; z-index: 1000; top: -100px; left: 1rem; padding: .7rem 1rem; background: #f1f4f5; color: #18383c; }
+.skip-link:focus { top: 1rem; }
+
+/* --- Header ------------------------------------------------------------- */
+.site-header { position: relative; z-index: 100; }
+.welcome-strip { margin: 0; padding: .5rem 1rem .55rem; background: var(--portfolio-blue); color: #fff; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.75rem, 1.15vw, 1rem); font-weight: 300; letter-spacing: .015em; line-height: 1; text-align: center; }
+.welcome-strip span { margin: 0 .3em; }
+
+.header-main { display: flex; width: min(100%, 980px); flex-direction: column; align-items: center; gap: 2.45rem; margin: 0 auto; padding: clamp(2.35rem, 4vw, 3.2rem) 1.25rem 1.6rem; }
+.header-brand { display: flex; align-items: center; justify-content: center; gap: clamp(1rem, 2.4vw, 1.7rem); }
+.profile-avatar { display: grid; width: clamp(76px, 8vw, 112px); aspect-ratio: 1; flex: 0 0 auto; place-items: center; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-avatar span { color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: 2.4rem; }
+
+.portfolio-name { display: flex; width: fit-content; align-items: baseline; justify-content: center; gap: .18em; color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: clamp(2rem, 4.6vw, 4.15rem); font-weight: 400; font-synthesis: none; letter-spacing: .025em; line-height: .9; text-transform: uppercase; }
+.portfolio-name span { white-space: nowrap; }
+.header-tagline { margin: .25rem 0 0; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.85rem, 1.5vw, 1.2rem); font-weight: 400; letter-spacing: .02em; text-align: left; }
+
+/* The one navigation for every width; the name predates the mobile layout. */
+.desktop-nav { display: flex; align-items: center; justify-content: center; gap: clamp(1.2rem, 4.6vw, 4.2rem); }
+
+/* --- Navigation links (header and footer) -------------------------------- */
+.desktop-nav a, .site-footer nav a { transition: color .18s ease, transform .2s ease; }
+.desktop-nav a:hover, .site-footer nav a:hover,
+.desktop-nav a:active, .site-footer nav a:active { transform: translateY(-3px); }
+.desktop-nav a:active, .site-footer nav a:active { animation: none; }
+
+.desktop-nav a { position: relative; padding: .2rem 0; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(.95rem, 1.55vw, 1.25rem); font-weight: 300; letter-spacing: .01em; line-height: 1.1; }
+.desktop-nav a:hover, .desktop-nav a.active { color: var(--portfolio-blue); }
+/* A click should not leave a focus ring behind. */
+.desktop-nav a:active { color: var(--portfolio-blue); outline: none; }
+
+/* --- Footer ------------------------------------------------------------- */
+.site-footer { display: flex; min-height: 126px; flex-direction: column; align-items: center; justify-content: center; gap: 1.15rem; padding: 1.6rem; background: var(--portfolio-blue); color: #fff; font-family: var(--font-sour-gummy), sans-serif; font-size: .8rem; letter-spacing: .08em; }
+.site-footer nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .6rem clamp(1.1rem, 3.8vw, 3.25rem); }
+.site-footer nav a { font-size: clamp(.92rem, 1.35vw, 1.1rem); font-weight: 300; letter-spacing: .01em; }
+.site-footer nav a:hover, .site-footer nav a:focus-visible { text-decoration: underline; }
+.site-footer p { margin: 0; color: rgba(255, 255, 255, .75); font-size: .72rem; font-weight: 300; letter-spacing: .04em; }
+
+/* --- Project grid (home) -------------------------------------------------- */
+.projects-grid { display: grid; width: min(1400px, calc(100% - 3rem)); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: auto; padding: .7rem 0 6rem; }
+.project-card { position: relative; display: block; min-width: 0; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 16px; background: #d8dfe1; clip-path: inset(0 round 16px); }
+.project-card img { object-fit: cover; transition: transform .65s cubic-bezier(.2, .7, .2, 1), filter .4s; }
+.project-card:hover img, .project-card:focus-visible img { filter: brightness(.68) saturate(.9); transform: scale(1.045); }
+.project-card-shade { position: absolute; inset: 0; background: linear-gradient(rgba(11, 26, 29, .08), rgba(11, 26, 29, .35)); }
+.project-card:hover .project-card-shade, .project-card:focus-visible .project-card-shade { background: linear-gradient(rgba(0, 0, 0, .08), rgba(0, 0, 0, .48)); }
+/* Fallback for a project without a logo file. */
+.project-card-title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; color: white; font-size: clamp(2rem, 3.5vw, 3.6rem); font-weight: 700; letter-spacing: .01em; line-height: .95; text-align: center; text-shadow: 0 2px 18px rgba(0, 0, 0, .45); text-transform: uppercase; }
+
+/* The box is a fixed share of the card wide and centred; its height comes from
+   the logo's own shape (`logoBoxHeight` in `data/site.ts`), because `contain`
+   sizes a square mark by the box height and a wide one by the box width. */
+.project-card-logo { position: absolute; z-index: 2; top: 50%; right: 19.4%; left: 19.4%; display: block; height: 64%; transform: translateY(-50%); pointer-events: none; }
+.project-card .project-card-logo img { object-fit: contain; filter: none; transform: none; transition: transform .35s ease, filter .35s ease; }
+.project-card:hover .project-card-logo img, .project-card:focus-visible .project-card-logo img { filter: none; transform: scale(1.035); }
+
+/* --- Illustration and marketing pages ---------------------------------- */
+.illustrations-gallery { padding: .7rem max(4vw, 1rem) 8rem; }
+
+/* --- Project page ------------------------------------------------------- */
+/* Centered project title with navigation anchored to each side. */
+.project-switcher { display: grid; width: min(1220px, calc(100% - 3rem)); grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr); align-items: center; gap: 1rem; margin: auto; padding: 1.7rem 0 2rem; text-align: center; }
+.project-switcher h1 { margin: 0; color: var(--portfolio-blue); font-family: var(--font-barrio), cursive; font-size: clamp(3rem, 5.6vw, 5.2rem); font-weight: 400; letter-spacing: .02em; line-height: .88; text-transform: uppercase; }
+.project-switcher > a { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1rem, 1.5vw, 1.25rem); font-weight: 400; line-height: 1; transition: color .18s ease, transform .18s ease; }
 .project-switcher > a:first-child { justify-self: start; }
 .project-switcher > a:last-child { justify-self: end; }
 .project-switcher > a svg { width: 1.25em; height: 1.25em; stroke-width: 1.7; }
@@ -646,46 +136,52 @@ html, body {
 .project-switcher > a:first-child:hover { transform: translateX(-3px); }
 .project-switcher > a:last-child:hover { transform: translateX(3px); }
 
-/* Click states should not leave decorative rectangles or outlines */
-.desktop-nav a:active { background: transparent; color: var(--portfolio-blue); outline: none; }
-.desktop-nav a:active::after { display: none; }
+/* Return-to-projects link follows the portfolio navigation style. */
+.project-back { padding: 5rem 1.5rem 7rem; text-align: center; }
+.ornate-button { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: .7rem 1.4rem; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1rem, 1.5vw, 1.25rem); font-weight: 400; letter-spacing: .01em; transition: color .18s ease, transform .2s ease; }
+.ornate-button:hover, .ornate-button:focus-visible { color: var(--portfolio-blue); transform: translateY(-3px); }
+.ornate-button > svg { width: 1rem; height: 1rem; }
+
+/* --- Galleries ---------------------------------------------------------- */
+/* Every work in a two-column layout on desktop. */
+.project-gallery { display: grid; width: min(1220px, calc(100% - 3rem)); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: auto; }
+.project-gallery-section-title { grid-column: 1 / -1; margin: .6rem 0; color: var(--portfolio-blue); font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1.25rem, 2vw, 1.65rem); font-weight: 400; letter-spacing: .01em; line-height: 1.1; text-align: center; }
+
+.project-shot { display: flex; min-width: 0; flex-direction: column; grid-column: span 1; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; }
+.project-shot.project-shot-hero, .project-shot.is-full-width { grid-column: 1 / -1; }
+.project-shot.is-standalone { width: calc((100% - 1rem) / 2); grid-column: 1 / -1; justify-self: center; }
 .project-shot:focus-visible { outline: none; }
 
-@media (max-width: 700px) {
-  .header-main { gap: 2.05rem; padding-top: 2.15rem; padding-bottom: 2.4rem; }
-  .project-switcher { grid-template-columns: minmax(64px, 1fr) auto minmax(64px, 1fr); width: calc(100% - 2rem); padding: 2.6rem 0 1.5rem; }
-  .project-switcher h1 { font-size: clamp(2rem, 10vw, 3.2rem); }
-  .project-switcher > a { font-size: .92rem; }
-  .project-switcher > a span { display: none; }
-}
+/* Offscreen tiles in a 57-image gallery cost layout and paint on every scroll
+   frame for pixels nobody is looking at. Skipping them is only safe because the
+   wrapper's inline `aspect-ratio` gives the browser a definite height without
+   consulting the contents, so a skipped tile reserves exactly as much room as a
+   rendered one and the scrollbar never jumps. */
+.project-shot-image { position: relative; display: block; border-radius: 12px; content-visibility: auto; }
+.project-shot-image img { display: block; width: 100%; height: auto; border-radius: 12px; object-fit: contain; transition: filter .3s ease, transform .3s ease; }
+.project-shot:hover .project-shot-image img, .project-shot:focus-visible .project-shot-image img { filter: brightness(.94); }
+.project-shot-caption { padding: .55rem .2rem 1.1rem; color: #64777a; font-family: var(--font-body); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+.project-shot-caption:empty { display: none; }
 
-/* Image galleries: show every work in a two-column layout on desktop. */
-.project-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.project-gallery .project-shot { grid-column: span 1; }
-.project-gallery .project-shot.is-wide { grid-column: span 1; }
-.project-gallery .project-shot.project-shot-hero { grid-column: 1 / -1; }
-.project-gallery .project-shot.is-full-width { grid-column: 1 / -1; }
-.project-gallery .project-shot.is-standalone { grid-column: 1 / -1; width: calc((100% - 1rem) / 2); justify-self: center; }
-.project-gallery-section-title { grid-column: 1 / -1; margin: .6rem 0; color: var(--portfolio-blue); font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1.25rem, 2vw, 1.65rem); font-weight: 400; letter-spacing: .01em; line-height: 1.1; text-align: center; }
-.project-gallery .project-shot-image,
-.project-gallery .project-shot-hero .project-shot-image,
-.project-gallery .project-shot.landscape .project-shot-image,
-.project-gallery .project-shot.square .project-shot-image,
-.project-gallery .project-shot.portrait .project-shot-image { display: block; aspect-ratio: auto; overflow: visible; border: 0; border-radius: 12px; background: transparent; }
-.project-gallery .project-shot-image img { display: block; width: 100%; height: auto; border-radius: 12px; object-fit: contain; filter: none; transform: none; transition: filter .25s ease; }
-.project-gallery .project-shot:hover img, .project-gallery .project-shot:focus-visible img { filter: brightness(.94); transform: none; }
 /* A covered tile. `is-mature` is on the tile only while the piece is still
    waiting on the viewer's answer, so granting consent lifts the blur across the
    gallery in one pass — the transition on the image is what makes that read as
    the artwork coming into focus rather than a set of tiles snapping. */
-.project-gallery .project-shot.is-mature { position: relative; }
-.project-gallery .project-shot.is-mature .project-shot-image { overflow: hidden; background: var(--portfolio-ink); }
-.project-gallery .project-shot .project-shot-image img { transition: filter .3s ease, transform .3s ease; }
-.project-gallery .project-shot.is-mature .project-shot-image img { filter: blur(18px) brightness(.62); transform: scale(1.08); }
+.project-shot.is-mature { position: relative; }
+.project-shot.is-mature .project-shot-image { overflow: hidden; background: var(--portfolio-ink); }
+.project-shot.is-mature .project-shot-image img,
+.project-shot.is-mature:hover .project-shot-image img,
+.project-shot.is-mature:focus-visible .project-shot-image img { filter: blur(18px) brightness(.62); transform: scale(1.08); }
 .mature-content-card-notice { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .28rem; color: #fff; font-family: var(--font-sour-gummy), sans-serif; pointer-events: none; text-align: center; }
 .mature-content-card-notice svg { width: 2rem; height: 2rem; }
 .mature-content-card-notice > span { font-size: clamp(1rem, 1.5vw, 1.2rem); font-weight: 400; }
 .mature-content-card-notice small { font-size: 1rem; font-weight: 300; }
+
+/* The handful of gallery files missing from the bucket: a quiet placeholder in
+   the slot they would have filled, rather than a browser's broken-image glyph. */
+.project-shot-missing { display: grid; width: 100%; height: 100%; border-radius: 12px; background: #f1efeb; color: #c3bcb0; place-items: center; }
+.project-shot-missing svg { width: 2rem; height: 2rem; }
+
 /* The illustrations collage. A column grid gave every tile in a row the height
    of the tallest one, which under 2:3 portraits interleaved with panoramas and
    a square meant half a column of white below most of them. This packs instead:
@@ -701,11 +197,10 @@ html, body {
    `columns + (columns - 1) * .04` for a gutter of 4% of a column — the 1rem the
    gallery already used at its full width, restated so that one span stays
    correct however many columns there are. Keep `.04` in step with `GAP_SHARE`. */
-.project-collage { container-type: inline-size; width: min(1220px, calc(100% - 3rem)); margin: auto; }
+.project-collage { width: min(1220px, calc(100% - 3rem)); margin: auto; container-type: inline-size; }
 .project-gallery.is-masonry {
   --column: calc(100cqw / 3.08);
   --gutter: calc(var(--column) * .04);
-  display: grid;
   width: 100%;
   margin: 0;
   grid-auto-flow: row dense;
@@ -716,95 +211,111 @@ html, body {
 }
 /* The gutter under a tile is part of its span, so the tile must sit at the top
    of that span rather than stretch through it. */
-.project-gallery.is-masonry .project-shot, .project-gallery.is-masonry .project-shot.is-wide { display: flex; width: auto; margin: 0; align-self: start; grid-row: span var(--span, 1); }
+.project-gallery.is-masonry .project-shot { width: auto; margin: 0; align-self: start; grid-row: span var(--span, 1); }
 .project-gallery.is-masonry .project-shot.is-wide { grid-column: span 2; }
-@media (max-width: 700px) { .project-gallery { grid-template-columns: 1fr; width: calc(100% - 2rem); gap: .7rem; } .project-gallery .project-shot, .project-gallery .project-shot.is-wide, .project-gallery .project-shot.is-standalone { grid-column: auto; width: auto; } .project-gallery .project-shot-image, .project-gallery .project-shot-image img { border-radius: 8px; } }
-@media (max-width: 900px) { .project-gallery.is-masonry { --column: calc(100cqw / 2.04); grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* A single column is a stack — there is nothing to pack, and the spans, which
-   size a panorama across two columns, would only open holes again. */
-@media (max-width: 700px) {
-  .project-collage { width: calc(100% - 2rem); }
-  .project-gallery.is-masonry { display: grid; grid-template-columns: 1fr; grid-auto-rows: auto; row-gap: .7rem; }
-  .project-gallery.is-masonry .project-shot, .project-gallery.is-masonry .project-shot.is-wide { grid-row: auto; grid-column: auto; }
-}
 
-/* Tabs use the same short, smooth movement as project navigation */
-.desktop-nav a, .site-footer nav a { transition: color .18s ease, transform .2s ease; }
-.desktop-nav a:hover, .site-footer nav a:hover { transform: translateY(-3px); }
-.desktop-nav a:active, .site-footer nav a:active { animation: none; transform: translateY(-3px); }
-
-/* Keep the project grid close to the primary navigation */
-.projects-page .projects-grid { padding-top: 1.2rem; }
-@media (max-width: 700px) { .projects-page .projects-grid { padding-top: .9rem; } }
-
-/* Shared distance from the tabs to each page's first content block */
-.header-main { padding-bottom: 1.6rem; }
-.projects-page .projects-grid, .illustrations-page .illustrations-gallery { padding-top: .7rem; }
-.project-switcher { padding-top: 1.7rem; }
-.contact-card { padding-top: clamp(1.8rem, 3vw, 2.6rem); }
-@media (max-width: 700px) {
-  .header-main { padding-bottom: 1.35rem; }
-  .projects-page .projects-grid, .illustrations-page .illustrations-gallery { padding-top: .65rem; }
-  .project-switcher { padding-top: 1.5rem; }
-  .contact-card { padding-top: 1.8rem; }
-}
-
-/* Keep project navigation in the portfolio blue in every interactive state */
-.project-switcher > a:hover,
-.project-switcher > a:focus-visible,
-.project-switcher > a:first-child:hover,
-.project-switcher > a:last-child:hover,
-.project-switcher > a:first-child:focus-visible,
-.project-switcher > a:last-child:focus-visible { color: var(--portfolio-blue); }
-
-/* Return-to-projects link follows the portfolio navigation style. */
-.project-back .ornate-button {
-  gap: .45rem;
-  border: 0;
-  background: transparent;
-  color: var(--portfolio-ink);
-  font-family: var(--font-sour-gummy), sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
-  font-weight: 400;
-  letter-spacing: .01em;
-  text-transform: none;
-  transition: color .18s ease, transform .2s ease;
-}
-.project-back .ornate-button:hover,
-.project-back .ornate-button:focus-visible {
-  background: transparent;
-  color: var(--portfolio-blue);
-  transform: translateY(-3px);
-}
-
-/* Always reserve the scrollbar track, so the layout never shifts sideways when
-   moving between a page tall enough to scroll and one that is not.
-
-   `scrollbar-gutter: stable` is the modern spelling but does nothing here:
-   it only applies to scroll containers, and in standards mode <html> with
-   `overflow: visible` is not one — it merely propagates its overflow to the
-   viewport. (It appears to work in quirks mode, which is a trap when testing.)
-   Verified in Chrome 151: gutter reserved 0px with `stable`, 15px with this.
-
-   Owning both axes here also keeps <html> the single scroll container, instead
-   of the viewport taking its overflow from body. ProjectGallery's scroll lock
-   depends on that — see the comment there. */
-html { overflow-x: hidden; overflow-y: scroll; }
-body { overflow-x: visible; }
-
-/* Sticky footer.
-   The footer lives inside <main>, and the page shells carried `min-height: 100vh`.
-   Because <main> starts below the header, that made the document taller than the
-   viewport by exactly the header's height — the surplus landing as a blank strip
-   after the footer on any page whose content is shorter than the screen (Contact).
-   Making the body a column lets the shell fill the *remaining* height instead. */
-body { display: flex; flex-direction: column; min-height: 100vh; }
-.projects-page, .project-page, .contact-page, .illustrations-page { flex: 1 0 auto; min-height: 0; }
-
-/* Contact is the one page shorter than the viewport: let the card take the slack
+/* --- Contact ------------------------------------------------------------ */
+/* Contact is the one page shorter than the viewport: the card takes the slack
    so its content stays optically centred and the footer sits on the bottom edge. */
 .contact-page { display: flex; flex-direction: column; }
-.contact-card { flex: 1 0 auto; }
+.contact-card {
+  display: grid;
+  min-height: min(680px, calc(100vh - 38px));
+  flex: 1 0 auto;
+  grid-template-columns: minmax(230px, 520px) minmax(0, 520px);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2.3rem, 7vw, 6.5rem);
+  padding: clamp(1.8rem, 3vw, 2.6rem) 1.5rem clamp(3.5rem, 8vw, 7rem);
+}
+.contact-portrait { width: 100%; }
+.contact-portrait img { display: block; width: 100%; height: auto; object-fit: contain; }
+.contact-description { max-width: 490px; margin: 1.55rem 0 2rem; font-family: var(--font-sour-gummy), sans-serif; font-size: clamp(1rem, 1.35vw, 1.15rem); font-weight: 300; line-height: 1.45; }
+.contact-description p { margin: 0; }
+.contact-description p + p { margin-top: 1rem; }
+.contact-description .contact-closing { color: var(--portfolio-blue); font-weight: 400; }
+.contact-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; font-family: var(--font-sour-gummy), sans-serif; }
+.cv-button { display: inline-flex; min-width: 146px; align-items: center; justify-content: center; padding: .8rem 1.7rem; border-radius: 999px; background: var(--portfolio-blue); color: #fff; font-size: 1.12rem; font-weight: 400; transition: transform .18s ease, background .18s ease; }
+.cv-button:hover, .cv-button:focus-visible { background: #2d2db7; transform: translateY(-2px); }
+.contact-links { display: flex; flex-wrap: wrap; gap: 1rem 1.6rem; }
+.contact-social-link { display: inline-flex; align-items: center; gap: .65rem; font-size: 1rem; font-weight: 400; transition: color .18s ease, transform .2s ease; }
+.contact-social-link > span:last-child { border-bottom: 1px solid currentColor; }
+.contact-social-icon { display: grid; width: 2.15rem; height: 2.15rem; border-radius: 50%; background: var(--portfolio-blue); color: #fff; place-items: center; }
+.contact-social-icon svg { width: 1.15rem; height: 1.15rem; }
+.contact-social-link:hover, .contact-social-link:focus-visible { color: var(--portfolio-blue); transform: translateY(-3px); }
+
+/* --- Back to top -------------------------------------------------------- */
+.back-to-top { position: fixed; z-index: 120; right: 1.35rem; bottom: 1.35rem; display: grid; width: 46px; height: 46px; padding: 0; border: 1px solid #18383c; border-radius: 50%; background: rgba(241, 244, 245, .94); color: #18383c; place-items: center; box-shadow: 0 4px 16px rgba(23, 56, 61, .15); animation: media-fade-in .22s ease; }
+.back-to-top svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.back-to-top:hover, .back-to-top:focus-visible { background: #18383c; color: white; }
+
+/* --- Breakpoints for everything above --------------------------------- */
+@media (max-width: 900px) {
+  .contact-portrait { margin: auto; }
+  .project-gallery.is-masonry { --column: calc(100cqw / 2.04); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  body { font-size: 15px; }
+
+  .header-main { gap: 2.05rem; padding: 2.15rem 1rem 1.35rem; }
+  .header-brand { gap: .85rem; }
+  .profile-avatar { width: 68px; }
+  .portfolio-name { flex-direction: column; gap: .04em; margin: auto; font-size: clamp(1.85rem, 9vw, 2.75rem); line-height: .8; text-align: center; }
+  .header-tagline { margin-top: .2rem; font-size: .85rem; }
+  /* Four links on one line down to a 320px screen: the type and the gaps shrink
+     with the viewport instead of the last link dropping onto a row of its own.
+     Wrapping stays on only as a safety net for anything narrower. */
+  .desktop-nav { width: 100%; flex-wrap: wrap; gap: .65rem clamp(.6rem, 3vw, 1.35rem); }
+  .desktop-nav a { font-size: clamp(.75rem, 3.6vw, .92rem); }
+
+  .site-footer { min-height: 142px; }
+  .site-footer nav { width: 100%; gap: .55rem 1.2rem; }
+
+  .projects-grid { width: calc(100% - 1rem); grid-template-columns: 1fr; gap: .8rem; padding: .65rem 0 4rem; }
+  .project-card { aspect-ratio: 4 / 3; border-radius: 12px; clip-path: inset(0 round 12px); }
+  .project-card-title { font-size: clamp(2rem, 10vw, 3rem); }
+
+  .illustrations-gallery { padding: .65rem 1rem 6rem; }
+
+  .project-switcher { width: calc(100% - 2rem); grid-template-columns: minmax(64px, 1fr) auto minmax(64px, 1fr); padding: 1.5rem 0; }
+  .project-switcher h1 { font-size: clamp(2rem, 10vw, 3.2rem); }
+  .project-switcher > a { font-size: .92rem; }
+  .project-switcher > a span { display: none; }
+
+  /* A single column is a stack — there is nothing to pack, and the spans, which
+     size a panorama across two columns, would only open holes again. */
+  .project-gallery { width: calc(100% - 2rem); grid-template-columns: 1fr; gap: .7rem; }
+  .project-collage { width: calc(100% - 2rem); }
+  .project-gallery.is-masonry { grid-template-columns: 1fr; grid-auto-rows: auto; row-gap: .7rem; }
+  .project-gallery.is-masonry .project-shot, .project-gallery.is-masonry .project-shot.is-wide { grid-row: auto; grid-column: auto; }
+  /* A standalone tile would otherwise keep the desktop `justify-self: center`,
+     which leaves it shrink-to-fit. A shrink-to-fit box sizes itself from its
+     contents, and the size containment that comes with `content-visibility`
+     reports those contents as empty, so the tile collapsed to zero while it was
+     offscreen. Stretching is what a single-column layout means by standalone. */
+  .project-shot { grid-column: auto; }
+  .project-shot.is-standalone { width: auto; grid-column: auto; justify-self: stretch; }
+  .project-shot-image, .project-shot-image img { border-radius: 8px; }
+  .project-shot-caption { padding-inline: .35rem; }
+
+  .contact-card { min-height: 0; grid-template-columns: minmax(0, 440px); gap: 2rem; padding: 1.8rem 1.4rem 5rem; text-align: center; }
+  .contact-portrait { width: min(68vw, 280px); }
+  .contact-description { margin: 1.25rem auto 1.8rem; }
+  .contact-actions { align-items: center; }
+  .contact-links { justify-content: center; }
+
+  .back-to-top { right: .8rem; bottom: .8rem; width: 42px; height: 42px; }
+}
+
+/* `background-attachment: fixed` cannot be composited: the browser repaints the
+   texture across the whole viewport on every scroll frame. That is affordable
+   on a desktop GPU and is not on a phone — and iOS Safari does not honour it
+   anyway. Below the breakpoint the texture simply scrolls with the page, which
+   for a seamless tile is indistinguishable. */
+@media (max-width: 900px), (hover: none) {
+  html, body { background-attachment: scroll; }
+}
 
 /* ===========================================================================
    Perceived loading
@@ -850,46 +361,12 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 .project-card-cover[data-state="loading"] ~ .project-card-shade,
 .project-card-cover[data-state="loading"] ~ .project-card-logo { opacity: 0; }
 
-/* The handful of gallery files missing from the bucket: a quiet placeholder in
-   the slot they would have filled, rather than a browser's broken-image glyph. */
-.project-shot-missing {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  background: #f1efeb;
-  color: #c3bcb0;
-  place-items: center;
-}
-.project-shot-missing svg { width: 2rem; height: 2rem; }
-
-/* Offscreen tiles in a 57-image gallery cost layout and paint on every scroll
-   frame for pixels nobody is looking at. Skipping them is only safe because the
-   wrapper's inline `aspect-ratio` gives the browser a definite height without
-   consulting the contents, so a skipped tile reserves exactly as much room as a
-   rendered one and the scrollbar never jumps. */
-.project-gallery .project-shot-image { content-visibility: auto; }
-
-/* The one place a tile had no definite width to hand that ratio. On phones the
-   gallery drops to a single column and the mobile rule resets `.is-standalone`
-   to `grid-column: auto; width: auto` — but not the `justify-self: center` it
-   inherits from the desktop rule, which leaves the tile shrink-to-fit. A
-   shrink-to-fit box sizes itself from its contents, and the size containment
-   that comes with `content-visibility` reports those contents as empty, so the
-   tile collapsed to zero while it was offscreen. Stretching is what a
-   single-column layout meant by "standalone" anyway. */
-@media (max-width: 700px) {
-  .project-gallery .project-shot.is-standalone { justify-self: stretch; }
-}
-
 /* --- Route skeletons ---------------------------------------------------- */
-.projects-grid .project-card.is-skeleton { display: block; }
-.project-gallery .project-shot-image.is-skeleton { display: block; width: 100%; border-radius: 12px; }
+.project-shot-image.is-skeleton { width: 100%; }
 .skeleton-heading { display: block; width: min(320px, 60%); height: clamp(3rem, 5.6vw, 5.2rem); border-radius: 10px; }
 .skeleton-lines { display: grid; gap: .7rem; max-width: 490px; margin: 1.55rem 0 2rem; }
 .skeleton-lines > span { display: block; height: .85rem; border-radius: 6px; }
 @media (max-width: 700px) {
-  .project-gallery .project-shot-image.is-skeleton { border-radius: 8px; }
   .skeleton-lines { margin-inline: auto; }
 }
 
@@ -916,12 +393,12 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 .project-lightbox .yarl__container { backdrop-filter: blur(12px); }
 
 /* The library locks scrolling by putting `overflow: hidden` on <body>, which
-   does nothing here: this stylesheet gives <html> `overflow-y: scroll` to keep
-   the scrollbar track reserved, and that makes <html> the scroll container, so
-   the page went on scrolling behind the open dialog. Following the class the
-   library sets up to the element that actually scrolls fixes it without
-   disabling its NoScroll module — the scrollbar padding it adds to <body> is
-   still what stops the page shifting sideways as the track is reclaimed. */
+   does nothing here: <html> has `overflow-y: scroll` to keep the scrollbar track
+   reserved, and that makes <html> the scroll container, so the page went on
+   scrolling behind the open dialog. Following the class the library sets up to
+   the element that actually scrolls fixes it without disabling its NoScroll
+   module — the scrollbar padding it adds to <body> is still what stops the page
+   shifting sideways as the track is reclaimed. */
 html:has(> body.yarl__no_scroll) { overflow: hidden; }
 .project-lightbox .yarl__button { display: grid; border-radius: 50%; place-items: center; transition: background .18s ease, color .18s ease; }
 @media (hover: hover) {
@@ -988,30 +465,6 @@ html:has(> body.yarl__no_scroll) { overflow: hidden; }
   .lightbox-caption { bottom: .5rem; font-size: .82rem; }
 }
 
-.back-to-top { animation: media-fade-in .22s ease; }
-
-/* --- Paper texture ------------------------------------------------------ */
-/* Served from `public/` rather than the bucket. It is the one image every page
-   paints before anything else, and going to the CDN for it meant a second DNS
-   lookup, TLS handshake and connection before the first pixel of background —
-   on a rate-limited `r2.dev` host at that. Same file, no round trip. */
-html, body { background-image: url("/textures/white-crumpled-paper.webp"); }
-
-/* `background-attachment: fixed` cannot be composited: the browser repaints the
-   texture across the whole viewport on every scroll frame. That is affordable
-   on a desktop GPU and is not on a phone — and iOS Safari does not honour it
-   anyway. Below the breakpoint the texture simply scrolls with the page, which
-   for a seamless tile is indistinguishable. */
-@media (max-width: 900px), (hover: none) {
-  html, body { background-attachment: scroll; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* The global reset already freezes animations, which would leave the shimmer
-     stuck mid-sweep. Drop the sweep and keep the flat tint. */
-  .media-image[data-state="loading"], .is-skeleton { background-image: none; }
-}
-
 /* --- Mature content gate ------------------------------------------------ */
 /* One card, used in both places a viewer can reach flagged artwork: as a modal
    over the gallery when a covered tile is clicked, and as an overlay inside the
@@ -1072,7 +525,7 @@ html, body { background-image: url("/textures/white-crumpled-paper.webp"); }
 }
 .mature-dialog::backdrop { background: rgba(3, 3, 3, .64); backdrop-filter: blur(6px); }
 /* A native modal dims the page but does not stop it scrolling. `<html>` is the
-   scroll container here — the same reason the lightbox rule below reaches for
+   scroll container here — the same reason the lightbox rule above reaches for
    it rather than `<body>`. */
 html:has(dialog.mature-dialog[open]) { overflow: hidden; }
 
@@ -1100,3 +553,11 @@ html:has(dialog.mature-dialog[open]) { overflow: hidden; }
 .mature-overlay-toggle svg { width: 2rem; height: 2rem; }
 .mature-overlay-toggle > span { font-size: clamp(1rem, 1.5vw, 1.2rem); font-weight: 400; }
 .mature-overlay-toggle small { font-size: 1rem; font-weight: 300; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  /* The reset above freezes animations, which would leave the shimmer stuck
+     mid-sweep. Drop the sweep and keep the flat tint. */
+  .media-image[data-state="loading"], .is-skeleton { background-image: none; }
+}

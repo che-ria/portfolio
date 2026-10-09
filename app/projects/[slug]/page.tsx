@@ -27,7 +27,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const previous = index > 0 ? projects[index - 1] : null;
   const next = index < projects.length - 1 ? projects[index + 1] : null;
 
-  return <main id="content" className="project-page textured-section">
+  return <main id="content" className="project-page">
     <nav className="project-switcher" aria-label="Project navigation">
       {previous ? <Link href={`/projects/${previous.id}`} aria-label={`Previous project: ${previous.title}`}><FiArrowLeft aria-hidden="true" /><span>Previous</span></Link> : <span aria-hidden="true" />}
       <h1>{project.title}</h1>

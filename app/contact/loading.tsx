@@ -1,5 +1,5 @@
 export default function Loading() {
-  return <main className="contact-page textured-section" aria-busy="true" aria-label="Loading contact details">
+  return <main className="contact-page" aria-busy="true" aria-label="Loading contact details">
     <section className="contact-card">
       <div className="contact-portrait"><span className="is-skeleton" style={{ display: "block", aspectRatio: 2816 / 4008 }} /></div>
       <div className="contact-copy">

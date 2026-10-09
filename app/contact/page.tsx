@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Contact" };
 
 export default function ContactPage() {
   return (
-    <main id="content" className="contact-page textured-section">
+    <main id="content" className="contact-page">
       <section className="contact-card" aria-label="Contact">
         <div className="contact-portrait">
           {/* 2816 × 4008 is the file's real size; the aspect ratio it implies is
