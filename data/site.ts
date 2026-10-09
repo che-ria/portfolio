@@ -103,7 +103,7 @@ const numbered = (count: number, name: (index: number) => string) => Array.from(
 const pad = (value: number) => String(value).padStart(2, "0");
 
 export const artworks: ProjectImage[] = [
-  "angel_devil_2k.jpg", "bomb23.jpg", "coco_2K.jpg", "fern2k.jpg", "frieren2k.jpg", "higuruma_2k.jpg", "maki2KK.png", "makima02_4k.jpg", "makima_2k.jpg", "makima_naked_2k.jpg", "reze2k.jpg", "yuki2k.jpg", "aponia.png", "ashaf.png", "final_no_type_small.png", "fu_xuan.png", "hua_cheng70.png", "inumaki.png", "itadori1.png", "kafka.png", "makima01.png", "maomao_jinshi1finish.png", "scara01.png", "Toji.png", "twins.png", "uqi_fanart.png", "yuta.png",
+  "chrollo_2k.png", "miku_serafim_2k.png", "rei2k.png", "angel_devil_2k.jpg", "bomb23.jpg", "coco_2K.jpg", "fern2k.jpg", "frieren2k.jpg", "higuruma_2k.jpg", "maki2KK.png", "makima02_4k.jpg", "makima_2k.jpg", "makima_naked_2k.jpg", "reze2k.jpg", "yuki2k.jpg", "aponia.png", "ashaf.png", "final_no_type_small.png", "fu_xuan.png", "hua_cheng70.png", "inumaki.png", "itadori1.png", "kafka.png", "makima01.png", "maomao_jinshi1finish.png", "scara01.png", "Toji.png", "twins.png", "uqi_fanart.png", "yuta.png",
 ].map(artwork("illustrations", "Illustration by Daryna Chernysheva"));
 
 export const marketingArtworks: ProjectImage[] = [
